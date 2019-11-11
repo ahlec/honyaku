@@ -5,10 +5,11 @@ import * as webpack from "webpack";
 const ROOT_DIRECTORY = __dirname;
 const BUILD_DIRECTORY = path.resolve(ROOT_DIRECTORY, "build");
 const SOURCE_DIRECTORY = path.resolve(ROOT_DIRECTORY, "src");
+const CLIENT_DIRECTORY = path.resolve(SOURCE_DIRECTORY, "client");
 
 const config: webpack.Configuration = {
   entry: {
-    app: SOURCE_DIRECTORY
+    app: CLIENT_DIRECTORY
   },
   module: {
     rules: [
@@ -61,12 +62,12 @@ const config: webpack.Configuration = {
   plugins: [
     new webpack.HashedModuleIdsPlugin(),
     new HtmlWebpackPlugin({
-      template: path.resolve(SOURCE_DIRECTORY, "index.html")
+      template: path.resolve(CLIENT_DIRECTORY, "index.html")
     })
   ],
   resolve: {
     alias: {
-      "@honyaku": SOURCE_DIRECTORY
+      "@client": CLIENT_DIRECTORY
     },
     extensions: [".js", ".jsx", ".json", ".ts", ".tsx", ".scss"]
   }

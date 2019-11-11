@@ -8,7 +8,9 @@ export default merge(
   {
     devServer: {
       historyApiFallback: true,
-      hot: true
+      hot: true,
+      open: true,
+      overlay: true
     },
     devtool: "inline-source-map",
     mode: "development",

@@ -1,4 +1,4 @@
-import { ActionInitialized } from "@honyaku/redux/actions";
+import { ActionInitialized } from "@client/redux/actions";
 
 type ReducerAction = ActionInitialized;
 
