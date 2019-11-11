@@ -61,7 +61,6 @@ async function serverDispatcher(
 
   if (CURRENT_ENVIRONMENT === Environment.Development) {
     response.setHeader("Access-Control-Allow-Origin", "*");
-    //    headers["Access-Control-Allow-Origin"] = request.headers.origin;
   }
 
   response.writeHead(statusCode);
