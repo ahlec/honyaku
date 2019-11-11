@@ -2,10 +2,7 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 import * as path from "path";
 import * as webpack from "webpack";
 
-const ROOT_DIRECTORY = __dirname;
-const BUILD_DIRECTORY = path.resolve(ROOT_DIRECTORY, "build");
-const SOURCE_DIRECTORY = path.resolve(ROOT_DIRECTORY, "src");
-const CLIENT_DIRECTORY = path.resolve(SOURCE_DIRECTORY, "client");
+import { BUILD_DIRECTORY, CLIENT_DIRECTORY, COMMON_DIRECTORY } from "./paths";
 
 const config: webpack.Configuration = {
   entry: {
@@ -67,7 +64,8 @@ const config: webpack.Configuration = {
   ],
   resolve: {
     alias: {
-      "@client": CLIENT_DIRECTORY
+      "@client": CLIENT_DIRECTORY,
+      "@common": COMMON_DIRECTORY
     },
     extensions: [".js", ".jsx", ".json", ".ts", ".tsx", ".scss"]
   }
