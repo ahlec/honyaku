@@ -1,5 +1,7 @@
 import { IncomingMessage } from "http";
 
+import Database from "./database/Database";
+
 export { IncomingMessage };
 
 export interface SuccessResponse {
@@ -20,4 +22,10 @@ export interface FailureResponse {
 
 export type Response = SuccessResponse | FailureResponse;
 
-export type Endpoint = (request: IncomingMessage) => Promise<Response>;
+export interface Endpoint {
+  processor: (
+    request: IncomingMessage,
+    database: Database
+  ) => Promise<Response>;
+  requiresAuthentication: boolean;
+}

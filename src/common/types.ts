@@ -2,14 +2,7 @@ export interface User {
   name: string;
 }
 
-export interface JapaneseFragment {
-  kana: string;
-  kanji: string | null;
-}
-
-export type Japanese = ReadonlyArray<JapaneseFragment>;
-
-export enum SourceType {
+export enum OriginType {
   Game = "game",
   Manga = "manga",
   Anime = "anime",
@@ -18,38 +11,40 @@ export enum SourceType {
 }
 
 export interface Origin {
-  id: string;
+  id: number;
   title: string;
+  type: OriginType;
 }
 
 export interface GameSource {
-  originId: string;
-  type: SourceType.Game;
+  originId: number;
+  type: OriginType.Game;
 }
 
 export interface MangaSource {
   chapterNo: number;
-  originId: string;
+  originId: number;
   pageNo: number;
-  type: SourceType.Manga;
+  type: OriginType.Manga;
 }
 
 export interface AnimeSource {
   episodeNo: number;
-  originId: string;
-  type: SourceType.Anime;
+  originId: number;
   seasonNo: number;
+  type: OriginType.Anime;
 }
 
 export interface BookSource {
   chapterNo: number;
-  originId: string;
+  originId: number;
   pageNo: number;
-  type: SourceType.Book;
+  type: OriginType.Book;
 }
 
 export interface NewsSource {
-  type: SourceType.News;
+  originId: number;
+  type: OriginType.News;
 }
 
 export type Source =
@@ -61,6 +56,7 @@ export type Source =
 
 export interface UserTranslation {
   comments: string | null;
+  id: number;
   timestampCreated: number;
   timestampModified: number | null;
   translation: string;
@@ -68,11 +64,18 @@ export interface UserTranslation {
 
 export interface OfficialTranslation {
   comments: string | null;
+  id: number;
   translation: string;
 }
 
+export interface Japanese {
+  markup: string;
+  kanaOnly: string;
+  kanjiOnly: string;
+}
+
 export interface Record {
-  id: string;
+  id: number;
   imageUrl: string | null;
   japanese: Japanese | null;
   officialTranslations: ReadonlyArray<OfficialTranslation>;
