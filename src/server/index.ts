@@ -86,6 +86,8 @@ function main() {
       response.setHeader("Access-Control-Allow-Origin", "*");
     }
 
+    response.setHeader("Content-Type", "application/json; charset=utf-8");
+
     response.writeHead(statusCode);
     response.write(body);
     response.end();

@@ -1,11 +1,7 @@
 import { isArray } from "lodash";
-import { createPool, OkPacket, Pool, RowDataPacket } from "mysql2/promise";
+import { createPool, Pool } from "mysql2/promise";
 
 import { SchemaEntryTypes, Schemas } from "./schemas";
-
-function isDataRow(row: RowDataPacket | OkPacket): row is RowDataPacket {
-  return row.constructor.name === "RowDataPacket";
-}
 
 export interface ConnectionInfo {
   host: string;
@@ -45,10 +41,6 @@ export default class Database {
     for (const row of rows) {
       if (isArray(row)) {
         throw new Error("Database does not support multi-queries yet.");
-      }
-
-      if (!isDataRow(row)) {
-        throw new Error("query() cannot be used for execution SQL queries.");
       }
 
       results.push(row);
