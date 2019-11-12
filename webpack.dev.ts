@@ -10,7 +10,8 @@ export default merge(
       historyApiFallback: true,
       hot: true,
       open: true,
-      overlay: true
+      overlay: true,
+      port: 7000
     },
     devtool: "inline-source-map",
     mode: "development",

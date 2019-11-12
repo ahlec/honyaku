@@ -1,24 +1,18 @@
-import {
-  combineReducers,
-  createStore,
-  Dispatch as ReduxDispatch,
-  Store as ReduxStore
-} from "redux";
+import { applyMiddleware, combineReducers, createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension/logOnlyInProduction";
-import { State } from "./index";
+import thunk from "redux-thunk";
 
-import authenticatedReducer from "./reducers/authenticated";
+import { ReduxAction, ReduxStore, State } from "./index";
 
-type Action = any;
+import applicationStateReducer from "@client/redux/applicationState/reducer";
+import originsReducer from "@client/redux/origins/reducer";
 
-export type Store = ReduxStore<State, Action>;
-export type Dispatch = ReduxDispatch<Action>;
-
-export function createRedux(): Store {
-  return createStore<State, Action, any, any>(
+export function createRedux(): ReduxStore {
+  return createStore<State, ReduxAction, any, any>(
     combineReducers<State>({
-      authenticated: authenticatedReducer
+      applicationState: applicationStateReducer,
+      origins: originsReducer
     }),
-    composeWithDevTools()
+    composeWithDevTools(applyMiddleware(thunk))
   );
 }

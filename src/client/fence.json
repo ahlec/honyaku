@@ -1,5 +1,18 @@
 {
   "tags": ["client"],
   "exports": [],
-  "imports": ["common"]
+  "imports": ["common"],
+  "dependencies": [
+    "classnames",
+    "lodash",
+    "meyer-reset-scss",
+    "query-string",
+    "react",
+    "react-dom",
+    "react-redux",
+    "react-router-dom",
+    "redux",
+    "redux-devtools-extension/logOnlyInProduction",
+    "redux-thunk"
+  ]
 }

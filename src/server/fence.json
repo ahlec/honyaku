@@ -1,5 +1,6 @@
 {
   "tags": ["server"],
   "exports": [],
-  "imports": ["common"]
+  "imports": ["common"],
+  "dependencies": ["lodash", "mysql2/promise", "dotenv"]
 }

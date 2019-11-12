@@ -83,7 +83,11 @@ function main() {
     const { body, statusCode } = await handleRequest(request);
 
     if (CURRENT_ENVIRONMENT === Environment.Development) {
-      response.setHeader("Access-Control-Allow-Origin", "*");
+      response.setHeader(
+        "Access-Control-Allow-Origin",
+        "http://localhost:7000"
+      );
+      response.setHeader("Access-Control-Allow-Credentials", "true");
     }
 
     response.setHeader("Content-Type", "application/json; charset=utf-8");
