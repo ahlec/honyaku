@@ -5,6 +5,8 @@ import { ReduxDispatch, State } from "@client/redux";
 import { ApplicationState } from "@client/redux/applicationState";
 import { initialize } from "@client/redux/applicationState/actions";
 
+import MainContent from "./MainContent";
+
 import "./Application.scss";
 
 interface ReduxProps {
@@ -28,8 +30,25 @@ class Application extends React.PureComponent<ComponentProps> {
   }
 
   public render() {
+    return <div className="Application">{this.renderMainContent()}</div>;
+  }
+
+  private renderMainContent(): React.ReactNode {
     const { applicationState } = this.props;
-    return <div className="Application">{applicationState}</div>;
+    switch (applicationState) {
+      case ApplicationState.Initializing: {
+        return "Loading...";
+      }
+      case ApplicationState.LoggedOut: {
+        return "Please log in.";
+      }
+      case ApplicationState.Authenticated: {
+        return <MainContent />;
+      }
+      case ApplicationState.Crashed: {
+        return "Experienced an application crash.";
+      }
+    }
   }
 }
 

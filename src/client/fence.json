@@ -13,6 +13,7 @@
     "react-router-dom",
     "redux",
     "redux-devtools-extension/logOnlyInProduction",
-    "redux-thunk"
+    "redux-thunk",
+    "reselect"
   ]
 }
