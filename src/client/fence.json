@@ -3,8 +3,12 @@
   "exports": [],
   "imports": ["common"],
   "dependencies": [
+    "@material-ui",
     "classnames",
     "lodash",
+    "formik",
+    "formik-material-ui",
+    "memoize-one",
     "meyer-reset-scss",
     "query-string",
     "react",

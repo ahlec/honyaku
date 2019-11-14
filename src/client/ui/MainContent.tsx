@@ -7,6 +7,12 @@ import OriginRouteUnwrapper, {
 import OriginsRouteUnwrapper, {
   ROUTE_PATH as ORIGINS_ROUTE_PATH
 } from "./origins/OriginsRouteUnwrapper";
+import RecordCreateRouteUnwrapper, {
+  ROUTE_PATH as RECORD_CREATE_ROUTE_PATH
+} from "./record-create-edit/RecordCreateRouteUnwrapper";
+import RecordEditRouteUnwrapper, {
+  ROUTE_PATH as RECORD_EDIT_ROUTE_PATH
+} from "./record-create-edit/RecordEditRouteUnwrapper";
 
 export default class Application extends React.PureComponent {
   public render() {
@@ -14,6 +20,14 @@ export default class Application extends React.PureComponent {
       <Switch>
         <Route path={ORIGIN_ROUTE_PATH} component={OriginRouteUnwrapper} />
         <Route path={ORIGINS_ROUTE_PATH} component={OriginsRouteUnwrapper} />
+        <Route
+          path={RECORD_CREATE_ROUTE_PATH}
+          component={RecordCreateRouteUnwrapper}
+        />
+        <Route
+          path={RECORD_EDIT_ROUTE_PATH}
+          component={RecordEditRouteUnwrapper}
+        />
         <Route render={this.renderMainContent} />
       </Switch>
     );
