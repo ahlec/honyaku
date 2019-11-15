@@ -23,9 +23,6 @@ export interface FailureResponse {
 export type Response = SuccessResponse | FailureResponse;
 
 export interface Endpoint {
-  processor: (
-    request: IncomingMessage,
-    database: Database
-  ) => Promise<Response>;
+  processor: (body: unknown, database: Database) => Promise<Response>;
   requiresAuthentication: boolean;
 }

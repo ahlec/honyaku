@@ -10,6 +10,22 @@ import { CURRENT_ENVIRONMENT, Environment } from "./environment";
 import Logger from "./Logger";
 import { FailureType } from "./types";
 
+async function readJsonBody(request: http.IncomingMessage): Promise<unknown> {
+  return new Promise((resolve, reject) => {
+    const body: string[] = [];
+    request.on("data", chunk => body.push(chunk));
+    request.on("end", () => {
+      const bodyStr = body.join("");
+      try {
+        const parsed = JSON.parse(bodyStr);
+        resolve(parsed);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  });
+}
+
 function main() {
   const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_SCHEMA } = process.env;
   if (!DB_HOST || !DB_PORT || !DB_USER || !DB_PASSWORD || !DB_SCHEMA) {
@@ -38,7 +54,8 @@ function main() {
         };
       }
 
-      const result = await endpoint.processor(request, database);
+      const body = await readJsonBody(request);
+      const result = await endpoint.processor(body, database);
       if (!result.success) {
         let statusCode: number;
         switch (result.type) {

@@ -1,7 +1,7 @@
 import Database from "@server/database/Database";
 import { DbOrigin, DbRecord, Schemas } from "@server/database/schemas";
 import Logger from "@server/Logger";
-import { IncomingMessage, Response } from "@server/types";
+import { Response } from "@server/types";
 
 import { InitializeServerResponse } from "@common/serverResponses";
 import {
@@ -83,7 +83,7 @@ const SOURCE_CREATORS: {
 };
 
 export default async function initializeEndpoint(
-  request: IncomingMessage,
+  request: never,
   database: Database
 ): Promise<Response> {
   const [

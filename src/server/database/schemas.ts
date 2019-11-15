@@ -49,3 +49,12 @@ export interface SchemaEntryTypes {
   [Schemas.Records]: DbRecord;
   [Schemas.UserTranslations]: DbUserTranslation;
 }
+
+export interface SchemaEntryProtoTypes {
+  [Schemas.OfficialTranslations]: Omit<DbOfficialTranslation, "translation_id">;
+  [Schemas.Origins]: Omit<DbOrigin, "origin_id">;
+  [Schemas.Records]: Omit<DbRecord, "record_id" | "created"> & {
+    created: { toSqlString: () => string } | number;
+  };
+  [Schemas.UserTranslations]: Omit<DbUserTranslation, "translation_id">;
+}

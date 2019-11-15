@@ -1,7 +1,7 @@
 import { isArray } from "lodash";
 import { createPool, Pool } from "mysql2/promise";
 
-import { SchemaEntryTypes, Schemas } from "./schemas";
+import { SchemaEntryProtoTypes, SchemaEntryTypes, Schemas } from "./schemas";
 
 export interface ConnectionInfo {
   host: string;
@@ -10,6 +10,16 @@ export interface ConnectionInfo {
   password: string;
   schema: string;
 }
+
+export interface CreationResult {
+  id: number;
+}
+
+export const CURRENT_TIMESTAMP = {
+  toSqlString() {
+    return "CURRENT_TIMESTAMP()";
+  }
+};
 
 export default class Database {
   public static open(info: ConnectionInfo): Database {
@@ -28,6 +38,21 @@ export default class Database {
   }
 
   private constructor(private readonly pool: Pool) {}
+
+  public async create<TSchema extends Schemas>(
+    schema: TSchema,
+    proto: SchemaEntryProtoTypes[TSchema]
+  ): Promise<CreationResult> {
+    const [result] = await this.pool.query(
+      `INSERT INTO ${schema} SET ?`,
+      proto
+    );
+    if (isArray(result)) {
+      throw new Error("Query SQL returned an array rather than an object.");
+    }
+
+    return { id: result.insertId };
+  }
 
   public async all<TSchema extends Schemas, TEntry = SchemaEntryTypes[TSchema]>(
     schema: TSchema
