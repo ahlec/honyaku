@@ -22,8 +22,7 @@ export function initialize() {
   return async (dispatch: ReduxDispatch) => {
     try {
       const response = await fetchApi<InitializeServerResponse>({
-        endpoint: "/initialize",
-        method: "GET"
+        endpoint: "/initialize"
       });
 
       const action: ActionInitialized = {

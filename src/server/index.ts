@@ -59,6 +59,13 @@ function main() {
         };
       }
 
+      if (request.method === "OPTIONS") {
+        return {
+          body: "",
+          statusCode: 200
+        };
+      }
+
       const body = await readJsonBody(request);
       const result = await endpoint.processor(body, database);
       if (!result.success) {
@@ -110,6 +117,7 @@ function main() {
         "http://localhost:7000"
       );
       response.setHeader("Access-Control-Allow-Credentials", "true");
+      response.setHeader("Access-Control-Allow-Headers", "Content-Type");
     }
 
     response.setHeader("Content-Type", "application/json; charset=utf-8");
