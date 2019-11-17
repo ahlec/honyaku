@@ -30,6 +30,7 @@ export default class Database {
       password: info.password,
       port: info.port,
       queueLimit: 3,
+      timezone: "Z",
       user: info.user,
       waitForConnections: true
     });

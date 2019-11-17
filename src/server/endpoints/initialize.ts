@@ -175,7 +175,7 @@ export default async function initializeEndpoint(
           : null,
       officialTranslations: officialTranslationsLookup[dbRow.record_id] || [],
       source,
-      timestampCreated: dbRow.created,
+      timestampCreated: dbRow.created.valueOf(),
       userTranslations: userTranslationsLookup[dbRow.record_id] || []
     });
   }

@@ -11,7 +11,7 @@ import memoizeOne from "memoize-one";
 import * as React from "react";
 import { connect } from "react-redux";
 
-import { Origin, OriginType, Source } from "@common/types";
+import { Origin, OriginType, ProtoRecord, Source } from "@common/types";
 
 import { State } from "@client/redux";
 import { OriginTypeLookup } from "@client/redux/origins";
@@ -19,8 +19,6 @@ import {
   getOriginsArray,
   getOriginTypeLookup
 } from "@client/redux/origins/selectors";
-
-import { ProtoRecord } from "./interfaces";
 
 interface ProvidedProps {
   current: ProtoRecord | null;

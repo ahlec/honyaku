@@ -1,4 +1,5 @@
 export type DbBoolean = 0 | 1;
+export type DbTimestamp = Date;
 
 export interface DbOfficialTranslation {
   translation_id: number;
@@ -15,7 +16,7 @@ export interface DbOrigin {
 
 export interface DbRecord {
   record_id: number;
-  created: number;
+  created: DbTimestamp;
   has_image: DbBoolean;
   origin_id: number;
   japanese_markup: string | null;
@@ -30,8 +31,8 @@ export interface DbRecord {
 export interface DbUserTranslation {
   translation_id: number;
   record_id: number;
-  created: number;
-  modified: number | null;
+  created: DbTimestamp;
+  modified: DbTimestamp | null;
   translation: string;
   comments: string | null;
 }
@@ -53,8 +54,6 @@ export interface SchemaEntryTypes {
 export interface SchemaEntryProtoTypes {
   [Schemas.OfficialTranslations]: Omit<DbOfficialTranslation, "translation_id">;
   [Schemas.Origins]: Omit<DbOrigin, "origin_id">;
-  [Schemas.Records]: Omit<DbRecord, "record_id" | "created"> & {
-    created: { toSqlString: () => string } | number;
-  };
+  [Schemas.Records]: Omit<DbRecord, "record_id">;
   [Schemas.UserTranslations]: Omit<DbUserTranslation, "translation_id">;
 }

@@ -8,7 +8,7 @@ export const ENDPOINTS: { [endpoint: string]: Endpoint | undefined } = {
     processor: initializeEndpoint,
     requiresAuthentication: false
   },
-  "/recod/create": {
+  "/record/create": {
     processor: createRecordEndpoint,
     requiresAuthentication: true
   }

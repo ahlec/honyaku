@@ -14,6 +14,13 @@ export default function recordsReducer(
 
       return next;
     }
+    case "record-created": {
+      const { record } = action;
+      return {
+        ...state,
+        [record.id]: record
+      };
+    }
     default:
       return state;
   }

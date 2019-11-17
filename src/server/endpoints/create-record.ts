@@ -1,4 +1,4 @@
-import Database, { CURRENT_TIMESTAMP } from "@server/database/Database";
+import Database from "@server/database/Database";
 import { Schemas } from "@server/database/schemas";
 import { Response } from "@server/types";
 
@@ -28,8 +28,9 @@ export default async function createRecordEndpoint(
     }
   }
 
+  const timestampCreated = Date.now();
   const { id } = await database.create(Schemas.Records, {
-    created: CURRENT_TIMESTAMP,
+    created: new Date(timestampCreated),
     has_image: 0,
     japanese_kana_only: request.japanese.kanaOnly,
     japanese_kanji_only: request.japanese.kanjiOnly,
@@ -42,7 +43,8 @@ export default async function createRecordEndpoint(
   });
 
   const response: CreateRecordServerResponse = {
-    recordId: id
+    recordId: id,
+    timestampCreated
   };
 
   return {

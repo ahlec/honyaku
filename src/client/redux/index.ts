@@ -6,6 +6,7 @@ import { ApplicationStateActions } from "@client/redux/applicationState/actions"
 import { OriginRecordsState } from "@client/redux/originRecords";
 import { OriginsState } from "@client/redux/origins";
 import { RecordsState } from "@client/redux/records";
+import { RecordActions } from "@client/redux/records/actions";
 
 export interface State {
   applicationState: ApplicationState;
@@ -14,7 +15,7 @@ export interface State {
   records: RecordsState;
 }
 
-export type ReduxAction = ApplicationStateActions;
+export type ReduxAction = ApplicationStateActions | RecordActions;
 
 export type ReduxStore = Store<State, ReduxAction>;
 export type ReduxDispatch = ThunkDispatch<State, void, ReduxAction>;

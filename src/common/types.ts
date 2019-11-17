@@ -83,3 +83,12 @@ export interface Record {
   timestampCreated: number;
   userTranslations: ReadonlyArray<UserTranslation>;
 }
+
+export type ProtoRecord = Omit<
+  Record,
+  | "id"
+  | "imageUrl"
+  | "officialTranslations"
+  | "timestampCreated"
+  | "userTranslations"
+>;

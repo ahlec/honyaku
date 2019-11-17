@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 
 import {
   Divider,
@@ -9,7 +10,9 @@ import {
   ListItemText
 } from "@material-ui/core";
 import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
-import { Inbox as InboxIcon, Mail as MailIcon } from "@material-ui/icons";
+import { Add as AddIcon, Home as HomeIcon } from "@material-ui/icons";
+
+import { ROUTE_PATH as CREATE_RECORD_ROUTE_PATH } from "@client/ui/record-create-edit/RecordCreateRouteUnwrapper";
 
 const styles = createStyles({
   fullList: {
@@ -44,25 +47,26 @@ class SideDrawer extends React.PureComponent<ComponentProps> {
       <Drawer anchor="left" open={isOpen} onClose={onClose}>
         <div className={classes.list} role="presentation">
           <List>
-            {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-              <ListItem button key={text}>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItem>
-            ))}
+            <ListItem button component={Link} to="/" onClick={onClose}>
+              <ListItemIcon>
+                <HomeIcon />
+              </ListItemIcon>
+              <ListItemText primary="Home" />
+            </ListItem>
           </List>
           <Divider />
           <List>
-            {["All mail", "Trash", "Spam"].map((text, index) => (
-              <ListItem button key={text}>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItem>
-            ))}
+            <ListItem
+              button
+              component={Link}
+              to={CREATE_RECORD_ROUTE_PATH}
+              onClick={onClose}
+            >
+              <ListItemIcon>
+                <AddIcon />
+              </ListItemIcon>
+              <ListItemText primary="Add Record" />
+            </ListItem>
           </List>
         </div>
       </Drawer>

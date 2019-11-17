@@ -7,4 +7,5 @@ export interface InitializeServerResponse {
 
 export interface CreateRecordServerResponse {
   recordId: number;
+  timestampCreated: number;
 }

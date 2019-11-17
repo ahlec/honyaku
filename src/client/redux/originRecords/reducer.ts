@@ -21,6 +21,15 @@ export default function originRecordsReducer(
 
       return next;
     }
+    case "record-created": {
+      const { record } = action;
+      const next = { ...state };
+      next[record.source.originId] = [
+        ...(next[record.source.originId] || []),
+        record.id
+      ];
+      return next;
+    }
     default:
       return state;
   }
