@@ -17,6 +17,11 @@ async function readJsonBody(request: http.IncomingMessage): Promise<unknown> {
     request.on("end", () => {
       const bodyStr = body.join("");
       try {
+        if (!bodyStr) {
+          resolve({});
+          return;
+        }
+
         const parsed = JSON.parse(bodyStr);
         resolve(parsed);
       } catch (e) {
