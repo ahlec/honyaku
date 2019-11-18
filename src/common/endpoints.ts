@@ -1,6 +1,3 @@
-import { Japanese, Source } from "./types";
+import { ProtoRecord } from "./types";
 
-export interface CreateRecordEndpoint {
-  japanese: Japanese;
-  source: Source;
-}
+export type CreateRecordEndpoint = ProtoRecord;

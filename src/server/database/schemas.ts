@@ -17,11 +17,12 @@ export interface DbOrigin {
 export interface DbRecord {
   record_id: number;
   created: DbTimestamp;
+  significance: "difficult" | "good-example" | "interesting";
   has_image: DbBoolean;
   origin_id: number;
-  japanese_markup: string | null;
-  japanese_kana_only: string | null;
-  japanese_kanji_only: string | null;
+  japanese_markup: string;
+  japanese_kana_only: string;
+  japanese_kanji_only: string;
   origin_chapter_no: number | null;
   origin_page_no: number | null;
   origin_season_no: number | null;

@@ -7,11 +7,18 @@ import {
 } from "@material-ui/core";
 import { Field, Form, Formik, FormikHelpers, FormikProps } from "formik";
 import { RadioGroup, TextField } from "formik-material-ui";
+import { values as objectValues } from "lodash";
 import memoizeOne from "memoize-one";
 import * as React from "react";
 import { connect } from "react-redux";
 
-import { Origin, OriginType, ProtoRecord, Source } from "@common/types";
+import {
+  Origin,
+  OriginType,
+  ProtoRecord,
+  RecordSignificance,
+  Source
+} from "@common/types";
 
 import { State } from "@client/redux";
 import { OriginTypeLookup } from "@client/redux/origins";
@@ -43,6 +50,7 @@ type ComponentProps = ProvidedProps & ReduxProps;
 interface FormValues {
   japanese: string;
   originId: string;
+  significance: RecordSignificance;
   sourceChapterNo: string;
   sourceEpisodeNo: string;
   sourcePageNo: string;
@@ -115,6 +123,8 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
           ? current.source.originId
           : origins[0].id
         ).toString(),
+        significance:
+          (current && current.significance) || RecordSignificance.Difficult,
         sourceChapterNo: sourceChapterNo.toString(),
         sourceEpisodeNo: sourceEpisodeNo.toString(),
         sourcePageNo: sourcePageNo.toString(),
@@ -152,6 +162,20 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
           {this.renderSourceDependentFields(props.values.originId)}
         </FormControl>
         <Field name="japanese" label="Japanese" component={TextField} />
+        <FormControl component="fieldset">
+          <FormLabel component="legend" required={true}>
+            Significance
+          </FormLabel>
+          <Field
+            name="significance"
+            label="Significance"
+            component={RadioGroup}
+          >
+            {objectValues(RecordSignificance).map(
+              this.renderSignificanceChoice
+            )}
+          </Field>
+        </FormControl>
         <Button
           disabled={!props.isValid}
           color="primary"
@@ -170,6 +194,17 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
         value={origin.id.toString()}
         control={<Radio />}
         label={origin.title}
+      />
+    );
+  };
+
+  private renderSignificanceChoice = (significance: RecordSignificance) => {
+    return (
+      <FormControlLabel
+        key={significance}
+        value={significance}
+        control={<Radio />}
+        label={significance}
       />
     );
   };
@@ -237,6 +272,7 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
           kanjiOnly: values.japanese,
           markup: values.japanese
         },
+        significance: values.significance,
         source
       };
 

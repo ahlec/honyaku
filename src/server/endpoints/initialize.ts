@@ -14,6 +14,7 @@ import {
   Origin,
   OriginType,
   Record,
+  RecordSignificance,
   Source,
   UserTranslation
 } from "@common/types";
@@ -30,6 +31,17 @@ function getOriginType(dbOrigin: DbOrigin): OriginType {
       return OriginType.Book;
     case "news":
       return OriginType.News;
+  }
+}
+
+function getSignificance(dbRecord: DbRecord): RecordSignificance {
+  switch (dbRecord.significance) {
+    case "difficult":
+      return RecordSignificance.Difficult;
+    case "good-example":
+      return RecordSignificance.GoodExample;
+    case "interesting":
+      return RecordSignificance.Interesting;
   }
 }
 
@@ -163,17 +175,13 @@ export default async function initializeEndpoint(
     records.push({
       id: dbRow.record_id,
       imageUrl: "", // TODO
-      japanese:
-        dbRow.japanese_markup &&
-        dbRow.japanese_kana_only &&
-        dbRow.japanese_kanji_only
-          ? {
-              kanaOnly: dbRow.japanese_kana_only,
-              kanjiOnly: dbRow.japanese_kanji_only,
-              markup: dbRow.japanese_markup
-            }
-          : null,
+      japanese: {
+        kanaOnly: dbRow.japanese_kana_only,
+        kanjiOnly: dbRow.japanese_kanji_only,
+        markup: dbRow.japanese_markup
+      },
       officialTranslations: officialTranslationsLookup[dbRow.record_id] || [],
+      significance: getSignificance(dbRow),
       source,
       timestampCreated: dbRow.created.valueOf(),
       userTranslations: userTranslationsLookup[dbRow.record_id] || []

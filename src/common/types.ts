@@ -74,10 +74,17 @@ export interface Japanese {
   kanjiOnly: string;
 }
 
+export enum RecordSignificance {
+  Difficult = "difficult",
+  GoodExample = "good-example",
+  Interesting = "interesting"
+}
+
 export interface Record {
   id: number;
+  significance: RecordSignificance;
   imageUrl: string | null;
-  japanese: Japanese | null;
+  japanese: Japanese;
   officialTranslations: ReadonlyArray<OfficialTranslation>;
   source: Source;
   timestampCreated: number;

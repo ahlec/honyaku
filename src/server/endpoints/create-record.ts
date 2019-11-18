@@ -39,7 +39,8 @@ export default async function createRecordEndpoint(
     origin_episode_no: episodeNo,
     origin_id: request.source.originId,
     origin_page_no: pageNo,
-    origin_season_no: seasonNo
+    origin_season_no: seasonNo,
+    significance: request.significance
   });
 
   const response: CreateRecordServerResponse = {
