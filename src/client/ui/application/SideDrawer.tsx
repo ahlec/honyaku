@@ -10,9 +10,14 @@ import {
   ListItemText
 } from "@material-ui/core";
 import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
-import { Add as AddIcon, Home as HomeIcon } from "@material-ui/icons";
+import {
+  Home as HomeIcon,
+  Note as NoteIcon,
+  NoteAdd as NoteAddIcon
+} from "@material-ui/icons";
 
 import { ROUTE_PATH as CREATE_RECORD_ROUTE_PATH } from "@client/ui/record-create-edit/RecordCreateRouteUnwrapper";
+import { ROUTE_PATH as RECORDS_ROUTE_PATH } from "@client/ui/records/RecordsRouteUnwrapper";
 
 const styles = createStyles({
   fullList: {
@@ -53,6 +58,17 @@ class SideDrawer extends React.PureComponent<ComponentProps> {
               </ListItemIcon>
               <ListItemText primary="Home" />
             </ListItem>
+            <ListItem
+              button
+              component={Link}
+              to={RECORDS_ROUTE_PATH}
+              onClick={onClose}
+            >
+              <ListItemIcon>
+                <NoteIcon />
+              </ListItemIcon>
+              <ListItemText primary="Browse Records" />
+            </ListItem>
           </List>
           <Divider />
           <List>
@@ -63,7 +79,7 @@ class SideDrawer extends React.PureComponent<ComponentProps> {
               onClick={onClose}
             >
               <ListItemIcon>
-                <AddIcon />
+                <NoteAddIcon />
               </ListItemIcon>
               <ListItemText primary="Add Record" />
             </ListItem>

@@ -13,6 +13,12 @@ import RecordCreateRouteUnwrapper, {
 import RecordEditRouteUnwrapper, {
   ROUTE_PATH as RECORD_EDIT_ROUTE_PATH
 } from "./record-create-edit/RecordEditRouteUnwrapper";
+import RecordViewRouteUnwrapper, {
+  ROUTE_PATH as RECORD_VIEW_ROUTE_PATH
+} from "./record-view/RecordRouteUnwrapper";
+import RecordsRouteUnwrapper, {
+  ROUTE_PATH as RECORDS_ROUTE_PATH
+} from "./records/RecordsRouteUnwrapper";
 
 export default class Application extends React.PureComponent {
   public render() {
@@ -28,6 +34,11 @@ export default class Application extends React.PureComponent {
           path={RECORD_EDIT_ROUTE_PATH}
           component={RecordEditRouteUnwrapper}
         />
+        <Route
+          path={RECORD_VIEW_ROUTE_PATH}
+          component={RecordViewRouteUnwrapper}
+        />
+        <Route path={RECORDS_ROUTE_PATH} component={RecordsRouteUnwrapper} />
         <Route render={this.renderMainContent} />
       </Switch>
     );

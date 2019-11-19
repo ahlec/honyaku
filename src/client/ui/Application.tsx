@@ -1,7 +1,6 @@
 import * as React from "react";
 import { connect } from "react-redux";
 
-import { Paper } from "@material-ui/core";
 import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
 
 import { ReduxDispatch, State } from "@client/redux";
@@ -12,10 +11,15 @@ import Header from "./application/Header";
 import SideDrawer from "./application/SideDrawer";
 import MainContent from "./MainContent";
 
-import "./Application.scss";
-
 const styles = createStyles({
-  root: {
+  appRoot: {
+    display: "flex",
+    flexDirection: "column",
+    height: "100vh"
+  },
+  contentRoot: {
+    flex: 1,
+    overflowX: "hidden",
     padding: 10
   }
 });
@@ -57,13 +61,13 @@ class Application extends React.PureComponent<ComponentProps, ComponentState> {
     const { isSideDrawerOpen } = this.state;
 
     return (
-      <div className="Application">
+      <div className={classes.appRoot}>
         <Header onOpenSideDrawer={this.onOpenSideDrawer} />
         <SideDrawer
           isOpen={isSideDrawerOpen}
           onClose={this.onCloseSideDrawer}
         />
-        <Paper className={classes.root}>{this.renderMainContent()}</Paper>
+        <div className={classes.contentRoot}>{this.renderMainContent()}</div>
       </div>
     );
   }
