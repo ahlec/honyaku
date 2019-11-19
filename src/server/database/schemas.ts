@@ -21,8 +21,6 @@ export interface DbRecord {
   has_image: DbBoolean;
   origin_id: number;
   japanese_markup: string;
-  japanese_kana_only: string;
-  japanese_kanji_only: string;
   origin_chapter_no: number | null;
   origin_page_no: number | null;
   origin_season_no: number | null;

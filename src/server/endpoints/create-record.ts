@@ -32,9 +32,7 @@ export default async function createRecordEndpoint(
   const { id } = await database.create(Schemas.Records, {
     created: new Date(timestampCreated),
     has_image: 0,
-    japanese_kana_only: request.japanese.kanaOnly,
-    japanese_kanji_only: request.japanese.kanjiOnly,
-    japanese_markup: request.japanese.markup,
+    japanese_markup: request.japaneseMarkup,
     origin_chapter_no: chapterNo,
     origin_episode_no: episodeNo,
     origin_id: request.source.originId,

@@ -9,6 +9,6 @@ interface ComponentProps {
 export default class RecordView extends React.PureComponent<ComponentProps> {
   public render() {
     const { record } = this.props;
-    return <div className="RecordView">{record.japanese.markup}</div>;
+    return <div className="RecordView">{record.japaneseMarkup}</div>;
   }
 }

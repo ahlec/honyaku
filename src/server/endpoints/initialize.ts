@@ -175,11 +175,7 @@ export default async function initializeEndpoint(
     records.push({
       id: dbRow.record_id,
       imageUrl: "", // TODO
-      japanese: {
-        kanaOnly: dbRow.japanese_kana_only,
-        kanjiOnly: dbRow.japanese_kanji_only,
-        markup: dbRow.japanese_markup
-      },
+      japaneseMarkup: dbRow.japanese_markup,
       officialTranslations: officialTranslationsLookup[dbRow.record_id] || [],
       significance: getSignificance(dbRow),
       source,

@@ -68,12 +68,6 @@ export interface OfficialTranslation {
   translation: string;
 }
 
-export interface Japanese {
-  markup: string;
-  kanaOnly: string;
-  kanjiOnly: string;
-}
-
 export enum RecordSignificance {
   Difficult = "difficult",
   GoodExample = "good-example",
@@ -84,7 +78,7 @@ export interface Record {
   id: number;
   significance: RecordSignificance;
   imageUrl: string | null;
-  japanese: Japanese;
+  japaneseMarkup: string;
   officialTranslations: ReadonlyArray<OfficialTranslation>;
   source: Source;
   timestampCreated: number;

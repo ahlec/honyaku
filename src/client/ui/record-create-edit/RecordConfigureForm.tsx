@@ -12,6 +12,8 @@ import memoizeOne from "memoize-one";
 import * as React from "react";
 import { connect } from "react-redux";
 
+import { KanjiMarkupEndpoint } from "@common/endpoints";
+import { KanjiMarkupServerResponse } from "@common/serverResponses";
 import {
   Origin,
   OriginType,
@@ -20,12 +22,14 @@ import {
   Source
 } from "@common/types";
 
+import { fetchApi } from "@client/api";
 import { State } from "@client/redux";
 import { OriginTypeLookup } from "@client/redux/origins";
 import {
   getOriginsArray,
   getOriginTypeLookup
 } from "@client/redux/origins/selectors";
+import { stringifyJapaneseMarkup } from "@common/japaneseMarkup";
 
 interface ProvidedProps {
   current: ProtoRecord | null;
@@ -48,8 +52,8 @@ function mapStateToProps(state: State): ReduxProps {
 type ComponentProps = ProvidedProps & ReduxProps;
 
 interface FormValues {
-  japanese: string;
   originId: string;
+  rawJapaneseInput: string;
   significance: RecordSignificance;
   sourceChapterNo: string;
   sourceEpisodeNo: string;
@@ -117,12 +121,11 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
       }
 
       return {
-        japanese:
-          (current && current.japanese && current.japanese.kanjiOnly) || "",
         originId: (current
           ? current.source.originId
           : origins[0].id
         ).toString(),
+        rawJapaneseInput: (current && current.japaneseMarkup) || "",
         significance:
           (current && current.significance) || RecordSignificance.Difficult,
         sourceChapterNo: sourceChapterNo.toString(),
@@ -161,7 +164,7 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
           </Field>
           {this.renderSourceDependentFields(props.values.originId)}
         </FormControl>
-        <Field name="japanese" label="Japanese" component={TextField} />
+        <Field name="rawJapaneseInput" label="Japanese" component={TextField} />
         <FormControl component="fieldset">
           <FormLabel component="legend" required={true}>
             Significance
@@ -265,13 +268,17 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
     actions.setSubmitting(true);
 
     try {
+      const kanjiMarkupBody: KanjiMarkupEndpoint = {
+        input: values.rawJapaneseInput
+      };
+      const { fragments } = await fetchApi<KanjiMarkupServerResponse>({
+        body: kanjiMarkupBody,
+        endpoint: "/kanji/markup"
+      });
+
       const source = getSourceFromFormValues(values, originTypes);
       const next: ProtoRecord = {
-        japanese: {
-          kanaOnly: values.japanese,
-          kanjiOnly: values.japanese,
-          markup: values.japanese
-        },
+        japaneseMarkup: stringifyJapaneseMarkup(fragments),
         significance: values.significance,
         source
       };

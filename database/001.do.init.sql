@@ -15,8 +15,6 @@ CREATE TABLE `records` (
 	`has_image` BIT(1) NOT NULL DEFAULT b'0',
 	`origin_id` INT(10) UNSIGNED NOT NULL DEFAULT '0',
 	`japanese_markup` TEXT NOT NULL COLLATE 'utf16_bin',
-	`japanese_kana_only` TEXT NOT NULL COLLATE 'utf16_bin',
-	`japanese_kanji_only` TEXT NOT NULL COLLATE 'utf16_bin',
 	`origin_chapter_no` INT(10) UNSIGNED NULL DEFAULT NULL,
 	`origin_page_no` INT(10) UNSIGNED NULL DEFAULT NULL,
 	`origin_season_no` INT(10) UNSIGNED NULL DEFAULT NULL,
