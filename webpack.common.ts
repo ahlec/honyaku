@@ -12,6 +12,9 @@ const config: webpack.Configuration = {
     rules: [
       {
         loader: "ts-loader",
+        options: {
+          configFile: path.resolve(__dirname, "./tsconfig.client.json")
+        },
         test: /\.(ts|tsx)$/
       },
       {

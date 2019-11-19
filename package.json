@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "start": "webpack-dev-server --config webpack.dev.ts",
-    "start:server": "ts-node -r tsconfig-paths/register ./src/server",
+    "start:server": "ts-node -r tsconfig-paths/register --project ./tsconfig.server.json ./src/server",
     "build": "webpack --config webpack.prod.ts",
     "clean": "rimraf ./build",
     "lint": "tslint 'src/**/*.ts?(x)' && gf"
