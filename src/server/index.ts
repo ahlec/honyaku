@@ -9,6 +9,7 @@ import { ENDPOINTS } from "./endpointRegistry";
 import { CURRENT_ENVIRONMENT, Environment } from "./environment";
 import Logger from "./Logger";
 import { FailureType } from "./types";
+import YahooAPI from "./YahooAPI";
 
 async function readJsonBody(request: http.IncomingMessage): Promise<unknown> {
   return new Promise((resolve, reject) => {
@@ -31,9 +32,23 @@ async function readJsonBody(request: http.IncomingMessage): Promise<unknown> {
   });
 }
 
-function main() {
-  const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_SCHEMA } = process.env;
-  if (!DB_HOST || !DB_PORT || !DB_USER || !DB_PASSWORD || !DB_SCHEMA) {
+async function main() {
+  const {
+    DB_HOST,
+    DB_PORT,
+    DB_USER,
+    DB_PASSWORD,
+    DB_SCHEMA,
+    YAHOO_API_CLIENT_ID
+  } = process.env;
+  if (
+    !DB_HOST ||
+    !DB_PORT ||
+    !DB_USER ||
+    !DB_PASSWORD ||
+    !DB_SCHEMA ||
+    !YAHOO_API_CLIENT_ID
+  ) {
     Logger.error("Missing one or more of the required .env fields");
     process.exit(2);
     return;
@@ -46,6 +61,8 @@ function main() {
     schema: DB_SCHEMA,
     user: DB_USER
   });
+
+  const yahooApi = new YahooAPI(YAHOO_API_CLIENT_ID);
 
   async function handleRequest(
     request: http.IncomingMessage
@@ -67,10 +84,14 @@ function main() {
       }
 
       const body = await readJsonBody(request);
-      const result = await endpoint.processor(body, database);
+      const result = await endpoint.processor(body, database, yahooApi);
       if (!result.success) {
         let statusCode: number;
         switch (result.type) {
+          case FailureType.BadInput: {
+            statusCode = 400;
+            break;
+          }
           case FailureType.Error: {
             statusCode = 500;
             break;

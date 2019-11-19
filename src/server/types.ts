@@ -1,6 +1,7 @@
 import { IncomingMessage } from "http";
 
 import Database from "./database/Database";
+import YahooAPI from "./YahooAPI";
 
 export { IncomingMessage };
 
@@ -10,6 +11,7 @@ export interface SuccessResponse {
 }
 
 export enum FailureType {
+  BadInput = "bad-input",
   Error = "error",
   NotAuthenticated = "not-authenticated"
 }
@@ -23,6 +25,10 @@ export interface FailureResponse {
 export type Response = SuccessResponse | FailureResponse;
 
 export interface Endpoint {
-  processor: (body: unknown, database: Database) => Promise<Response>;
+  processor: (
+    body: unknown,
+    database: Database,
+    yahooAPI: YahooAPI
+  ) => Promise<Response>;
   requiresAuthentication: boolean;
 }

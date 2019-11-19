@@ -1,3 +1,4 @@
+import { JapaneseTextFragment } from "./japaneseMarkup";
 import { Origin, Record } from "./types";
 
 export interface InitializeServerResponse {
@@ -8,4 +9,9 @@ export interface InitializeServerResponse {
 export interface CreateRecordServerResponse {
   recordId: number;
   timestampCreated: number;
+}
+
+export interface KanjiMarkupServerResponse {
+  fragments: ReadonlyArray<JapaneseTextFragment>;
+  input: string;
 }
