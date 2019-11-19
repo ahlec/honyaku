@@ -2,5 +2,11 @@
   "tags": ["server"],
   "exports": [],
   "imports": ["common"],
-  "dependencies": ["lodash", "mysql2/promise", "dotenv"]
+  "dependencies": [
+    "lodash",
+    "mysql2/promise",
+    "dotenv",
+    "fast-xml-parser",
+    "query-string"
+  ]
 }
