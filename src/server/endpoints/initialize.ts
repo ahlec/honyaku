@@ -1,5 +1,10 @@
 import Database from "@server/database/Database";
-import { DbOrigin, DbRecord, Schemas } from "@server/database/schemas";
+import {
+  DbOrigin,
+  DbRecord,
+  DbUserTranslation,
+  Schemas
+} from "@server/database/schemas";
 import Logger from "@server/Logger";
 import { Response } from "@server/types";
 
@@ -16,6 +21,7 @@ import {
   Record,
   RecordSignificance,
   Source,
+  TranslationConfidence,
   UserTranslation,
   WebsiteSource
 } from "@common/types";
@@ -45,6 +51,21 @@ function getSignificance(dbRecord: DbRecord): RecordSignificance {
       return RecordSignificance.GoodExample;
     case "interesting":
       return RecordSignificance.Interesting;
+  }
+}
+
+function getTranslationConfidence(
+  dbTranslation: DbUserTranslation
+): TranslationConfidence {
+  switch (dbTranslation.confidence) {
+    case "mostly-guesswork":
+      return TranslationConfidence.MostlyGuesswork;
+    case "shaky":
+      return TranslationConfidence.Shaky;
+    case "confident":
+      return TranslationConfidence.Confident;
+    case "certain":
+      return TranslationConfidence.Certain;
   }
 }
 
@@ -150,6 +171,7 @@ export default async function initializeEndpoint(
 
     arr.push({
       comments: dbRow.comments,
+      confidence: getTranslationConfidence(dbRow as DbUserTranslation),
       id: dbRow.translation_id,
       timestampCreated: 0, // dbRow.created,
       timestampModified: 0, // dbRow.modified,

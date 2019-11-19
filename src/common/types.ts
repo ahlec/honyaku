@@ -62,19 +62,34 @@ export type Source =
   | NewsSource
   | WebsiteSource;
 
+export enum TranslationConfidence {
+  MostlyGuesswork = "mostly-guesswork",
+  Shaky = "shaky",
+  Confident = "confident",
+  Certain = "certain"
+}
+
 export interface UserTranslation {
   comments: string | null;
   id: number;
   timestampCreated: number;
   timestampModified: number | null;
   translation: string;
+  confidence: TranslationConfidence;
 }
+
+export type ProtoUserTranslation = Omit<
+  UserTranslation,
+  "id" | "timestampCreated" | "timestampModified"
+>;
 
 export interface OfficialTranslation {
   comments: string | null;
   id: number;
   translation: string;
 }
+
+export type ProtoOfficialTranslation = Omit<OfficialTranslation, "id">;
 
 export enum RecordSignificance {
   Difficult = "difficult",

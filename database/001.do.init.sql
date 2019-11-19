@@ -50,6 +50,7 @@ CREATE TABLE `user_translations` (
 	`modified` TIMESTAMP NULL DEFAULT NULL,
 	`translation` TEXT NOT NULL COLLATE 'utf16_bin',
 	`comments` TEXT NULL COLLATE 'utf16_bin',
+	`confidence` ENUM('mostly-guesswork','shaky','confident','certain') NOT NULL COLLATE 'utf16_bin',
 	PRIMARY KEY (`translation_id`),
 	INDEX `user_translations_record_FK` (`record_id`),
 	CONSTRAINT `user_translations_record_FK` FOREIGN KEY (`record_id`) REFERENCES `records` (`record_id`)

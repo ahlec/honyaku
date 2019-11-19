@@ -35,6 +35,7 @@ export interface DbUserTranslation {
   modified: DbTimestamp | null;
   translation: string;
   comments: string | null;
+  confidence: "mostly-guesswork" | "shaky" | "confident" | "certain";
 }
 
 export enum Schemas {
