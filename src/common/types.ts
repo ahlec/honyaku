@@ -7,7 +7,8 @@ export enum OriginType {
   Manga = "manga",
   Anime = "anime",
   Book = "book",
-  News = "news"
+  News = "news",
+  Website = "website"
 }
 
 export interface Origin {
@@ -47,12 +48,19 @@ export interface NewsSource {
   type: OriginType.News;
 }
 
+export interface WebsiteSource {
+  originId: number;
+  type: OriginType.Website;
+  url: string;
+}
+
 export type Source =
   | GameSource
   | MangaSource
   | AnimeSource
   | BookSource
-  | NewsSource;
+  | NewsSource
+  | WebsiteSource;
 
 export interface UserTranslation {
   comments: string | null;

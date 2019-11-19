@@ -1,7 +1,7 @@
 CREATE TABLE `origins` (
 	`origin_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`title` TEXT NOT NULL COLLATE 'utf16_bin',
-	`origin_type` ENUM('game','manga','anime','book','news') NOT NULL COLLATE 'utf16_bin',
+	`origin_type` ENUM('game','manga','anime','book','news','website') NOT NULL COLLATE 'utf16_bin',
 	PRIMARY KEY (`origin_id`)
 )
 COLLATE='utf16_bin'
@@ -19,6 +19,7 @@ CREATE TABLE `records` (
 	`origin_page_no` INT(10) UNSIGNED NULL DEFAULT NULL,
 	`origin_season_no` INT(10) UNSIGNED NULL DEFAULT NULL,
 	`origin_episode_no` INT(10) UNSIGNED NULL DEFAULT NULL,
+	`origin_url` TEXT NULL COLLATE 'utf16_bin',
 	PRIMARY KEY (`record_id`),
 	INDEX `records_origin_FK` (`origin_id`),
 	CONSTRAINT `records_origin_FK` FOREIGN KEY (`origin_id`) REFERENCES `origins` (`origin_id`)

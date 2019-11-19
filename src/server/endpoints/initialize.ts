@@ -16,7 +16,8 @@ import {
   Record,
   RecordSignificance,
   Source,
-  UserTranslation
+  UserTranslation,
+  WebsiteSource
 } from "@common/types";
 
 function getOriginType(dbOrigin: DbOrigin): OriginType {
@@ -31,6 +32,8 @@ function getOriginType(dbOrigin: DbOrigin): OriginType {
       return OriginType.Book;
     case "news":
       return OriginType.News;
+    case "website":
+      return OriginType.Website;
   }
 }
 
@@ -91,7 +94,18 @@ const SOURCE_CREATORS: {
   [OriginType.News]: (dbRow: DbRecord): NewsSource => ({
     originId: dbRow.origin_id,
     type: OriginType.News
-  })
+  }),
+  [OriginType.Website]: (dbRow: DbRecord): WebsiteSource | null => {
+    if (dbRow.origin_url === null) {
+      return null;
+    }
+
+    return {
+      originId: dbRow.origin_id,
+      type: OriginType.Website,
+      url: dbRow.origin_url
+    };
+  }
 };
 
 export default async function initializeEndpoint(

@@ -59,6 +59,7 @@ interface FormValues {
   sourceEpisodeNo: string;
   sourcePageNo: string;
   sourceSeasonNo: string;
+  sourceUrl: string;
 }
 
 function getSourceFromFormValues(
@@ -84,6 +85,13 @@ function getSourceFromFormValues(
         type: originType
       };
     }
+    case OriginType.Website: {
+      return {
+        originId: parseInt(values.originId, 10),
+        type: originType,
+        url: values.sourceUrl
+      };
+    }
     case OriginType.Game:
     case OriginType.News: {
       return {
@@ -104,6 +112,7 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
       let sourceEpisodeNo = 0;
       let sourcePageNo = 0;
       let sourceSeasonNo = 0;
+      let sourceUrl: string | null = null;
       if (current) {
         switch (current.source.type) {
           case OriginType.Book:
@@ -115,6 +124,10 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
           case OriginType.Anime: {
             sourceEpisodeNo = current.source.episodeNo;
             sourceSeasonNo = current.source.seasonNo;
+            break;
+          }
+          case OriginType.Website: {
+            sourceUrl = current.source.url;
             break;
           }
         }
@@ -131,7 +144,8 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
         sourceChapterNo: sourceChapterNo.toString(),
         sourceEpisodeNo: sourceEpisodeNo.toString(),
         sourcePageNo: sourcePageNo.toString(),
-        sourceSeasonNo: sourceSeasonNo.toString()
+        sourceSeasonNo: sourceSeasonNo.toString(),
+        sourceUrl: sourceUrl || ""
       };
     }
   );
@@ -256,6 +270,9 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
             />
           </React.Fragment>
         );
+      }
+      case OriginType.Website: {
+        return <Field name="sourceUrl" label="URL" component={TextField} />;
       }
     }
   }

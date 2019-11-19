@@ -11,7 +11,7 @@ export interface DbOfficialTranslation {
 export interface DbOrigin {
   origin_id: number;
   title: string;
-  origin_type: "game" | "manga" | "anime" | "book" | "news";
+  origin_type: "game" | "manga" | "anime" | "book" | "news" | "website";
 }
 
 export interface DbRecord {
@@ -25,6 +25,7 @@ export interface DbRecord {
   origin_page_no: number | null;
   origin_season_no: number | null;
   origin_episode_no: number | null;
+  origin_url: string | null;
 }
 
 export interface DbUserTranslation {
