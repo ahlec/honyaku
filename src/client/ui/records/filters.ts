@@ -1,9 +1,9 @@
-import { Record } from "@common/types";
+import { ReduxRecord } from "@client/redux/records";
 
 export interface RecordFilter {
   id: string;
   label: string;
-  predicate: (record: Record) => boolean;
+  predicate: (record: ReduxRecord) => boolean;
 }
 
 export interface FiltersCollection {
@@ -11,31 +11,10 @@ export interface FiltersCollection {
   status: ReadonlyArray<RecordFilter>;
 }
 
-const STATUS_FILTERS: ReadonlyArray<RecordFilter> = [
-  {
-    id: "missing-user-translation",
-    label: "Missing user translations",
-    predicate: record => !record.userTranslations.length
-  },
-  {
-    id: "has-user-translation",
-    label: "Has user translations",
-    predicate: record => !!record.userTranslations.length
-  },
-  {
-    id: "missing-official-translation",
-    label: "Missing official translations",
-    predicate: record => !record.officialTranslations.length
-  },
-  {
-    id: "has-official-translation",
-    label: "Has official translations",
-    predicate: record => !!record.officialTranslations.length
-  }
-];
+const STATUS_FILTERS: ReadonlyArray<RecordFilter> = [];
 
 export function getFiltersCollection(
-  records: ReadonlyArray<Record>
+  records: ReadonlyArray<ReduxRecord>
 ): FiltersCollection | null {
   if (!records.length) {
     return null;

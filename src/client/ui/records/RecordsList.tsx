@@ -5,8 +5,8 @@ import { Grid } from "@material-ui/core";
 // import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
 
 import { State } from "@client/redux";
+import { ReduxRecord } from "@client/redux/records";
 import { getRecordsArray } from "@client/redux/records/selectors";
-import { Record } from "@common/types";
 
 import FilterBar from "./FilterBar";
 import { RecordFilter } from "./filters";
@@ -14,7 +14,7 @@ import RecordCard from "./RecordCard";
 import RecordProvider from "./RecordProvider";
 
 interface ReduxProps {
-  records: ReadonlyArray<Record>;
+  records: ReadonlyArray<ReduxRecord>;
 }
 
 function mapStateToProps(state: State): ReduxProps {
@@ -54,11 +54,11 @@ class RecordsList extends React.PureComponent<ComponentProps, ComponentState> {
     );
   }
 
-  private renderRecords = (records: ReadonlyArray<Record>) => {
+  private renderRecords = (records: ReadonlyArray<ReduxRecord>) => {
     return records.map(this.renderLink);
   };
 
-  private renderLink = (record: Record) => {
+  private renderLink = (record: ReduxRecord) => {
     return (
       <Grid key={record.id} item xs={3}>
         <RecordCard record={record} />

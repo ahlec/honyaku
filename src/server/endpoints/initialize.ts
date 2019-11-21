@@ -18,8 +18,8 @@ import {
   OfficialTranslation,
   Origin,
   OriginType,
-  Record,
   RecordSignificance,
+  ServerRecord,
   Source,
   TranslationConfidence,
   UserTranslation,
@@ -198,7 +198,7 @@ export default async function initializeEndpoint(
   }
 
   // Handle records
-  const records: Record[] = [];
+  const records: ServerRecord[] = [];
   for (const dbRow of dbRecords) {
     const originId = dbRow.origin_id;
     const originType = originTypeLookup[originId];

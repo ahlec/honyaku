@@ -2,12 +2,12 @@ import { fetchApi } from "@client/api";
 import { ReduxDispatch } from "@client/redux";
 
 import { CreateRecordServerResponse } from "@common/serverResponses";
-import { ProtoRecord, Record } from "@common/types";
+import { ProtoRecord, ServerRecord } from "@common/types";
 
 export interface ActionRecordCreated {
   type: "record-created";
 
-  record: Record;
+  record: ServerRecord;
 }
 
 export type RecordActions = ActionRecordCreated;

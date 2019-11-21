@@ -11,9 +11,9 @@ import {
 import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
 import { NavigateNext as NavigateNextIcon } from "@material-ui/icons";
 
+import { ReduxRecord } from "@client/redux/records";
 import JapaneseMarkupDisplay from "@client/ui/components/JapaneseMarkup";
 import { getLinkToRecordView } from "@client/ui/record-view/RecordRouteUnwrapper";
-import { Record } from "@common/types";
 
 const styles = createStyles({
   fullViewLinkButton: {
@@ -25,7 +25,7 @@ const styles = createStyles({
 });
 
 interface ProvidedProps {
-  record: Record;
+  record: ReduxRecord;
 }
 
 type ComponentProps = ProvidedProps & WithStyles<typeof styles>;

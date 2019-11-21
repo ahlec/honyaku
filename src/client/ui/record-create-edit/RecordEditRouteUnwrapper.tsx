@@ -2,23 +2,22 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
 
-import { Record } from "@common/types";
-
 import { State } from "@client/redux";
+import { ReduxRecord } from "@client/redux/records";
 import ErrorRedirect from "@client/ui/ErrorRedirect";
 
 import RecordConfigureForm from "./RecordConfigureForm";
 
 export const ROUTE_PATH = "/record/:id(\\d+)/edit";
 
-export function getLinkToRecordEdit(record: Record): string {
+export function getLinkToRecordEdit(record: ReduxRecord): string {
   return `/record/${record.id}/edit`;
 }
 
 type ProvidedProps = RouteComponentProps<{ id: string }>;
 
 interface ReduxProps {
-  record: Record | null;
+  record: ReduxRecord | null;
 }
 
 function mapStateToProps(state: State, props: ProvidedProps): ReduxProps {

@@ -1,10 +1,10 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
 
-import { Record } from "@common/types";
+import { ReduxRecord } from "@client/redux/records";
 
 interface ComponentProps {
-  record: Record;
+  record: ReduxRecord;
 }
 
 export default class RecordView extends React.PureComponent<ComponentProps> {

@@ -97,7 +97,7 @@ export enum RecordSignificance {
   Interesting = "interesting"
 }
 
-export interface Record {
+export interface ServerRecord {
   id: number;
   significance: RecordSignificance;
   imageUrl: string | null;
@@ -109,7 +109,7 @@ export interface Record {
 }
 
 export type ProtoRecord = Omit<
-  Record,
+  ServerRecord,
   | "id"
   | "imageUrl"
   | "officialTranslations"

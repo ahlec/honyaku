@@ -1,21 +1,20 @@
 import { createSelector } from "reselect";
 
-import { Record } from "@common/types";
-
 import { State } from "@client/redux";
+import { ReduxRecord } from "@client/redux/records";
 
 export const getRecordsFromOrigin: (
   state: State,
   originId: number
-) => ReadonlyArray<Record> = createSelector(
+) => ReadonlyArray<ReduxRecord> = createSelector(
   (state: State, originId: number) => state.originRecords[originId],
   (state: State) => state.records,
-  (originRecords, recordsLookup): ReadonlyArray<Record> => {
+  (originRecords, recordsLookup): ReadonlyArray<ReduxRecord> => {
     if (!originRecords || !originRecords.length) {
       return [];
     }
 
-    const records: Record[] = [];
+    const records: ReduxRecord[] = [];
     for (const recordId of originRecords) {
       records.push(recordsLookup[recordId]);
     }

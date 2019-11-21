@@ -6,7 +6,7 @@ import { Chip, Divider, IconButton, Menu, MenuItem } from "@material-ui/core";
 import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
 import { FilterList as FilterListIcon } from "@material-ui/icons";
 
-import { Record } from "@common/types";
+import { ReduxRecord } from "@client/redux/records";
 
 import {
   FiltersCollection,
@@ -22,10 +22,10 @@ const styles = createStyles({
 
 interface ProvidedProps {
   /**
-   * An array of all of the {@link Record}s that should be
+   * An array of all of the {@link ReduxRecord}s that should be
    * considered.
    */
-  allRecords: ReadonlyArray<Record>;
+  allRecords: ReadonlyArray<ReduxRecord>;
 
   /**
    * A list of any optional filters that should be used
@@ -55,7 +55,7 @@ class FilterBar extends React.PureComponent<ComponentProps, ComponentState> {
   };
 
   private readonly memoizeGetFiltersCollection = memoizeOne(
-    (records: ReadonlyArray<Record>): FiltersCollection | null =>
+    (records: ReadonlyArray<ReduxRecord>): FiltersCollection | null =>
       getFiltersCollection(records)
   );
 

@@ -2,13 +2,13 @@ import { fetchApi } from "@client/api";
 import { ReduxDispatch } from "@client/redux";
 
 import { InitializeServerResponse } from "@common/serverResponses";
-import { Origin, Record } from "@common/types";
+import { Origin, ServerRecord } from "@common/types";
 
 export interface ActionInitialized {
   type: "initialized";
 
   origins: ReadonlyArray<Origin>;
-  records: ReadonlyArray<Record>;
+  records: ReadonlyArray<ServerRecord>;
 }
 
 export interface ActionFatalError {

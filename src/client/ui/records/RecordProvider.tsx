@@ -1,22 +1,22 @@
 import memoizeOne from "memoize-one";
 import * as React from "react";
 
-import { Record } from "@common/types";
+import { ReduxRecord } from "@client/redux/records";
 
 import { RecordFilter } from "./filters";
 
 interface ProvidedProps {
   /**
-   * An array of all of the {@link Record}s that should be
+   * An array of all of the {@link ReduxRecord}s that should be
    * considered.
    */
-  allRecords: ReadonlyArray<Record>;
+  allRecords: ReadonlyArray<ReduxRecord>;
 
   /**
    * A render function that will be passed the filtered list of records
    * based on the other input parameters to this component.
    */
-  children: (records: ReadonlyArray<Record>) => React.ReactNode;
+  children: (records: ReadonlyArray<ReduxRecord>) => React.ReactNode;
 
   /**
    * A list of any optional filters that should be used
@@ -32,9 +32,9 @@ export default class RecordProvider extends React.PureComponent<
 > {
   private readonly memoizeFilteredRecords = memoizeOne(
     (
-      records: ReadonlyArray<Record>,
+      records: ReadonlyArray<ReduxRecord>,
       filters: ReadonlyArray<RecordFilter>
-    ): ReadonlyArray<Record> => {
+    ): ReadonlyArray<ReduxRecord> => {
       if (!filters.length) {
         return records;
       }
