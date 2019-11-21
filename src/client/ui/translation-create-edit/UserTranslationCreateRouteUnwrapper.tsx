@@ -5,10 +5,15 @@ import { RouteComponentProps } from "react-router";
 import { ProtoUserTranslation } from "@common/types";
 
 import { ReduxDispatch, State } from "@client/redux";
+import { ReduxRecord } from "@client/redux/records";
 import { createUserTranslation } from "@client/redux/userTranslations/actions";
 import ErrorRedirect from "@client/ui/ErrorRedirect";
 
 import TranslationConfigureForm from "./TranslationConfigureForm";
+
+export function getLinkToCreateUserTranslation(record: ReduxRecord): string {
+  return `/record/${record.id}/user-translation/add`;
+}
 
 export const ROUTE_PATH = "/record/:id(\\d+)/user-translation/add";
 

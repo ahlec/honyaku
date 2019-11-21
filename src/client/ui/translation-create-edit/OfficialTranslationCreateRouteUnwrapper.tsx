@@ -6,10 +6,17 @@ import { ProtoOfficialTranslation } from "@common/types";
 
 import { ReduxDispatch, State } from "@client/redux";
 import { createOfficialTranslation } from "@client/redux/officialTranslations/actions";
+import { ReduxRecord } from "@client/redux/records";
 
 import ErrorRedirect from "@client/ui/ErrorRedirect";
 
 import TranslationConfigureForm from "./TranslationConfigureForm";
+
+export function getLinkToCreateOfficialTranslation(
+  record: ReduxRecord
+): string {
+  return `/record/${record.id}/official-translation/add`;
+}
 
 export const ROUTE_PATH = "/record/:id(\\d+)/official-translation/add";
 
