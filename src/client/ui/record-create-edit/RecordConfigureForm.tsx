@@ -1,13 +1,23 @@
 import {
   Button,
+  Container,
   FormControl,
   FormControlLabel,
   FormLabel,
-  Radio
+  Grid,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Radio,
+  Theme,
+  Typography
 } from "@material-ui/core";
+import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
+import { ArrowForwardIos as SubcategoryArrowIcon } from "@material-ui/icons";
+import classnames from "classnames";
 import { Field, Form, Formik, FormikHelpers, FormikProps } from "formik";
-import { RadioGroup, TextField } from "formik-material-ui";
-import { values as objectValues } from "lodash";
+import { RadioGroup, Select, TextField } from "formik-material-ui";
+import { orderBy, values as objectValues } from "lodash";
 import memoizeOne from "memoize-one";
 import * as React from "react";
 import { connect } from "react-redux";
@@ -24,12 +34,40 @@ import {
 
 import { fetchApi } from "@client/api";
 import { State } from "@client/redux";
-import { OriginTypeLookup } from "@client/redux/origins";
+import { OriginsLookup, OriginTypeLookup } from "@client/redux/origins";
 import {
-  getOriginsArray,
+  getOriginsLookup,
   getOriginTypeLookup
 } from "@client/redux/origins/selectors";
 import { stringifyJapaneseMarkup } from "@common/japaneseMarkup";
+
+import {
+  ORIGIN_TYPE_DEFINITIONS,
+  RECORD_SIGNIFICANCE_DEFINITIONS
+} from "@client/i18n/enums";
+
+const styles = (theme: Theme) =>
+  createStyles({
+    disabledArrowIcon: {
+      opacity: 0.25
+    },
+    paper: {
+      padding: theme.spacing(2)
+    },
+    root: {
+      marginTop: theme.spacing(3)
+    },
+    subcontentArrow: {
+      display: "block",
+      margin: "auto",
+      paddingTop: 12
+    }
+  });
+
+const ALPHABETICAL_ORIGIN_TYPES = orderBy(
+  objectValues(OriginType),
+  type => ORIGIN_TYPE_DEFINITIONS[type].displayName
+);
 
 interface ProvidedProps {
   current: ProtoRecord | null;
@@ -38,21 +76,22 @@ interface ProvidedProps {
 }
 
 interface ReduxProps {
-  origins: ReadonlyArray<Origin>;
+  originsLookup: OriginsLookup;
   originTypes: OriginTypeLookup;
 }
 
 function mapStateToProps(state: State): ReduxProps {
   return {
     originTypes: getOriginTypeLookup(state),
-    origins: getOriginsArray(state)
+    originsLookup: getOriginsLookup(state)
   };
 }
 
-type ComponentProps = ProvidedProps & ReduxProps;
+type ComponentProps = ProvidedProps & ReduxProps & WithStyles<typeof styles>;
 
 interface FormValues {
   originId: string;
+  originType: OriginType | "";
   rawJapaneseInput: string;
   significance: RecordSignificance;
   sourceChapterNo: string;
@@ -60,6 +99,21 @@ interface FormValues {
   sourcePageNo: string;
   sourceSeasonNo: string;
   sourceUrl: string;
+}
+
+function doesOriginTypeHaveCustomFields(type: OriginType): boolean {
+  switch (type) {
+    case OriginType.Book:
+    case OriginType.Manga:
+    case OriginType.Anime:
+    case OriginType.Website: {
+      return true;
+    }
+    case OriginType.Game:
+    case OriginType.News: {
+      return false;
+    }
+  }
 }
 
 function getSourceFromFormValues(
@@ -104,15 +158,15 @@ function getSourceFromFormValues(
 
 class RecordConfigureForm extends React.PureComponent<ComponentProps> {
   private readonly getInitialValues = memoizeOne(
-    (
-      current: ProtoRecord | null,
-      origins: ReadonlyArray<Origin>
-    ): FormValues => {
+    (current: ProtoRecord | null): FormValues => {
+      let originId: string | null = null;
+      let originType: OriginType | "" = "";
       let sourceChapterNo = 0;
       let sourceEpisodeNo = 0;
       let sourcePageNo = 0;
       let sourceSeasonNo = 0;
       let sourceUrl: string | null = null;
+
       if (current) {
         switch (current.source.type) {
           case OriginType.Book:
@@ -131,13 +185,14 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
             break;
           }
         }
+
+        originId = current.source.originId.toString();
+        originType = current.source.type;
       }
 
       return {
-        originId: (current
-          ? current.source.originId
-          : origins[0].id
-        ).toString(),
+        originId: originId || "",
+        originType,
         rawJapaneseInput: (current && current.japaneseMarkup) || "",
         significance:
           (current && current.significance) || RecordSignificance.Difficult,
@@ -151,67 +206,142 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
   );
 
   public render() {
-    const { current, origins } = this.props;
+    const { classes, current } = this.props;
     return (
-      <div className="RecordConfigureForm">
-        <Formik<FormValues>
-          initialValues={this.getInitialValues(current, origins)}
-          onSubmit={this.onSubmit}
-        >
-          {this.renderForm}
-        </Formik>
-      </div>
+      <Container className={classes.root} fixed maxWidth="md">
+        <Paper className={classes.paper}>
+          <Formik<FormValues>
+            initialValues={this.getInitialValues(current)}
+            onSubmit={this.onSubmit}
+          >
+            {this.renderForm}
+          </Formik>
+        </Paper>
+      </Container>
     );
   }
 
-  private renderForm = (props: FormikProps<FormValues>) => {
-    const { origins } = this.props;
-
+  private renderForm = (formikProps: FormikProps<FormValues>) => {
     return (
       <Form>
-        <FormControl component="fieldset">
-          <FormLabel component="legend" required={true}>
-            Source
-          </FormLabel>
-          <Field name="originId" label="Origin" component={RadioGroup}>
-            {origins.map(this.renderOriginChoice)}
-          </Field>
-          {this.renderSourceDependentFields(props.values.originId)}
-        </FormControl>
-        <Field name="rawJapaneseInput" label="Japanese" component={TextField} />
-        <FormControl component="fieldset">
-          <FormLabel component="legend" required={true}>
-            Significance
-          </FormLabel>
-          <Field
-            name="significance"
-            label="Significance"
-            component={RadioGroup}
+        <Grid container spacing={3}>
+          {this.renderOriginFields(formikProps)}
+
+          <Grid item sm={12}>
+            <Field
+              name="rawJapaneseInput"
+              label="Japanese"
+              component={TextField}
+            />
+          </Grid>
+          <FormControl component="fieldset">
+            <FormLabel component="legend" required={true}>
+              Significance
+            </FormLabel>
+            <Field
+              name="significance"
+              label="Significance"
+              component={RadioGroup}
+            >
+              {objectValues(RecordSignificance).map(
+                this.renderSignificanceChoice
+              )}
+            </Field>
+          </FormControl>
+          <Button
+            disabled={!formikProps.isValid}
+            color="primary"
+            onClick={formikProps.submitForm}
           >
-            {objectValues(RecordSignificance).map(
-              this.renderSignificanceChoice
-            )}
-          </Field>
-        </FormControl>
-        <Button
-          disabled={!props.isValid}
-          color="primary"
-          onClick={props.submitForm}
-        >
-          Submit
-        </Button>
+            Submit
+          </Button>
+        </Grid>
       </Form>
+    );
+  };
+
+  private renderOriginFields(formikProps: FormikProps<FormValues>) {
+    const { classes, originsLookup } = this.props;
+
+    const { originId, originType } = formikProps.values;
+
+    return (
+      <React.Fragment>
+        <Grid item sm={3}>
+          <FormControl fullWidth>
+            <InputLabel htmlFor="origin-type">Origin Type</InputLabel>
+            <Field
+              name="originType"
+              component={Select}
+              inputProps={{ id: "origin-type" }}
+            >
+              {ALPHABETICAL_ORIGIN_TYPES.map(this.renderOriginTypeChoice)}
+            </Field>
+          </FormControl>
+        </Grid>
+        <Grid item sm={1}>
+          <SubcategoryArrowIcon
+            className={classnames(
+              classes.subcontentArrow,
+              !originType && classes.disabledArrowIcon
+            )}
+          />
+        </Grid>
+        <Grid item sm={3}>
+          <FormControl disabled={!originType} fullWidth>
+            <InputLabel htmlFor="origin">Origin</InputLabel>
+            <Field
+              name="originId"
+              component={Select}
+              inputProps={{ id: "origin" }}
+              disabled={!originType}
+            >
+              {originType &&
+                originsLookup[originType].map(this.renderOriginChoice)}
+            </Field>
+          </FormControl>
+        </Grid>
+        <Grid item sm={1}>
+          <SubcategoryArrowIcon
+            className={classnames(
+              classes.subcontentArrow,
+              (!originType ||
+                !originId ||
+                !doesOriginTypeHaveCustomFields(originType)) &&
+                classes.disabledArrowIcon
+            )}
+          />
+        </Grid>
+        <Grid item sm={3}>
+          {!originType || !originId
+            ? null
+            : this.renderSourceDependentFields(formikProps.values.originId)}
+        </Grid>
+      </React.Fragment>
+    );
+  }
+
+  private renderOriginTypeChoice = (originType: OriginType) => {
+    const { originsLookup } = this.props;
+
+    const numOrigins = originsLookup[originType].length;
+    return (
+      <MenuItem
+        key={originType}
+        value={originType.toString()}
+        disabled={!numOrigins}
+      >
+        {ORIGIN_TYPE_DEFINITIONS[originType].displayName} ({numOrigins}{" "}
+        {numOrigins === 1 ? "option" : "options"})
+      </MenuItem>
     );
   };
 
   private renderOriginChoice = (origin: Origin) => {
     return (
-      <FormControlLabel
-        key={origin.id}
-        value={origin.id.toString()}
-        control={<Radio />}
-        label={origin.title}
-      />
+      <MenuItem key={origin.id} value={origin.id.toString()}>
+        {origin.title}
+      </MenuItem>
     );
   };
 
@@ -221,7 +351,7 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
         key={significance}
         value={significance}
         control={<Radio />}
-        label={significance}
+        label={RECORD_SIGNIFICANCE_DEFINITIONS[significance].displayName}
       />
     );
   };
@@ -230,10 +360,6 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
     const { originTypes } = this.props;
     const type = originTypes[originId];
     switch (type) {
-      case OriginType.Game:
-      case OriginType.News: {
-        return null;
-      }
       case OriginType.Book:
       case OriginType.Manga: {
         return (
@@ -243,12 +369,14 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
               label="Chapter"
               type="number"
               component={TextField}
+              inputProps={{ min: 1 }}
             />
             <Field
               name="sourcePageNo"
               label="Page Number"
               type="number"
               component={TextField}
+              inputProps={{ min: 1 }}
             />
           </React.Fragment>
         );
@@ -261,18 +389,27 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
               label="Season"
               type="number"
               component={TextField}
+              inputProps={{ min: 1 }}
             />
             <Field
               name="sourceEpisodeNo"
               label="Episode"
               type="number"
               component={TextField}
+              inputProps={{ min: 1 }}
             />
           </React.Fragment>
         );
       }
       case OriginType.Website: {
         return <Field name="sourceUrl" label="URL" component={TextField} />;
+      }
+      default: {
+        if (doesOriginTypeHaveCustomFields(type)) {
+          throw new Error();
+        }
+
+        return <Typography>There are no further fields to set.</Typography>;
       }
     }
   }
@@ -309,4 +446,6 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
   };
 }
 
-export default connect(mapStateToProps)(RecordConfigureForm);
+export default connect(mapStateToProps)(
+  withStyles(styles)(RecordConfigureForm)
+);
