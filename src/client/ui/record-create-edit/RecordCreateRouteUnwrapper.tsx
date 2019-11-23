@@ -21,7 +21,8 @@ class RecordCreateRouteUnwrapper extends React.PureComponent<ComponentProps> {
 
   private onSubmit = async (proto: ProtoRecord) => {
     const { dispatch } = this.props;
-    await dispatch(createRecord(proto));
+    const record = await dispatch(createRecord(proto));
+    return record.id;
   };
 }
 

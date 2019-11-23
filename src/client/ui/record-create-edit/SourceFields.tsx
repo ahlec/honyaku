@@ -139,7 +139,11 @@ class SourceFields extends React.PureComponent<ComponentProps> {
           />
         </Grid>
         <Grid item sm={3}>
-          {!originType || !originId ? null : this.renderSourceDependentFields()}
+          {!originType || !originId ? (
+            <Typography>Select an origin first.</Typography>
+          ) : (
+            this.renderSourceDependentFields()
+          )}
         </Grid>
       </React.Fragment>
     );

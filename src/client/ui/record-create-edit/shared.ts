@@ -1,6 +1,7 @@
 import { OriginType, RecordSignificance } from "@common/types";
 
 export interface FormValues {
+  createAnother: boolean;
   originId: string;
   originType: OriginType | "";
   rawJapaneseInput: string;

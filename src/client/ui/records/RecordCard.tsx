@@ -44,7 +44,7 @@ class RecordCard extends React.PureComponent<ComponentProps> {
           <IconButton
             className={classes.fullViewLinkButton}
             component={Link}
-            to={getLinkToRecordView(record)}
+            to={getLinkToRecordView(record.id)}
           >
             <NavigateNextIcon />
           </IconButton>

@@ -48,7 +48,8 @@ class RecordEditRouteUnwrapper extends React.PureComponent<ComponentProps> {
   }
 
   private onSubmit = async () => {
-    return;
+    // TODO
+    return -1;
   };
 }
 

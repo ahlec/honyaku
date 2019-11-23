@@ -10,8 +10,8 @@ import RecordView from "./RecordView";
 
 export const ROUTE_PATH = "/record/:id(\\d+)";
 
-export function getLinkToRecordView(record: ReduxRecord): string {
-  return `/record/${record.id}`;
+export function getLinkToRecordView(recordId: number): string {
+  return `/record/${recordId}`;
 }
 
 type ProvidedProps = RouteComponentProps<{ id: string }>;

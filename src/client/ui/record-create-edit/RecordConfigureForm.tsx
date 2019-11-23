@@ -1,22 +1,25 @@
 import {
   Button,
+  Checkbox,
   Container,
   FormControl,
   FormControlLabel,
-  FormLabel,
   Grid,
+  InputLabel,
+  MenuItem,
   Paper,
-  Radio,
   Theme
 } from "@material-ui/core";
 import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
 import { Field, Form, Formik, FormikHelpers, FormikProps } from "formik";
-import { RadioGroup, TextField } from "formik-material-ui";
+import { Select, TextField } from "formik-material-ui";
 import { values as objectValues } from "lodash";
 import memoizeOne from "memoize-one";
 import * as React from "react";
+import { Redirect } from "react-router-dom";
 
 import { KanjiMarkupEndpoint } from "@common/endpoints";
+import { stringifyJapaneseMarkup } from "@common/japaneseMarkup";
 import { KanjiMarkupServerResponse } from "@common/serverResponses";
 import {
   OriginType,
@@ -26,9 +29,8 @@ import {
 } from "@common/types";
 
 import { fetchApi } from "@client/api";
-import { stringifyJapaneseMarkup } from "@common/japaneseMarkup";
-
 import { RECORD_SIGNIFICANCE_DEFINITIONS } from "@client/i18n/enums";
+import { getLinkToRecordView } from "@client/ui/record-view/RecordRouteUnwrapper";
 
 import { FormValues } from "./shared";
 import SourceFields from "./SourceFields";
@@ -43,10 +45,12 @@ const styles = (theme: Theme) =>
     }
   });
 
+type RecordId = number;
+
 interface ProvidedProps {
   current: ProtoRecord | null;
 
-  onSubmit: (record: ProtoRecord) => Promise<void>;
+  onSubmit: (record: ProtoRecord) => Promise<RecordId>;
 }
 
 type ComponentProps = ProvidedProps & WithStyles<typeof styles>;
@@ -92,7 +96,19 @@ function getSourceFromFormValues(values: FormValues): Source {
   }
 }
 
-class RecordConfigureForm extends React.PureComponent<ComponentProps> {
+interface ComponentState {
+  redirectRecordId: number | null;
+}
+
+class RecordConfigureForm extends React.PureComponent<
+  ComponentProps,
+  ComponentState
+> {
+  public state: ComponentState = {
+    redirectRecordId: null
+  };
+  private hasUnmounted = false;
+
   private readonly getInitialValues = memoizeOne(
     (current: ProtoRecord | null): FormValues => {
       let originId: string | null = null;
@@ -127,6 +143,7 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
       }
 
       return {
+        createAnother: false,
         originId: originId || "",
         originType,
         rawJapaneseInput: (current && current.japaneseMarkup) || "",
@@ -141,8 +158,18 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
     }
   );
 
+  public componentWillUnmount() {
+    this.hasUnmounted = true;
+  }
+
   public render() {
     const { classes, current } = this.props;
+    const { redirectRecordId } = this.state;
+
+    if (redirectRecordId !== null) {
+      return <Redirect to={getLinkToRecordView(redirectRecordId)} />;
+    }
+
     return (
       <Container className={classes.root} fixed maxWidth="md">
         <Paper className={classes.paper}>
@@ -158,6 +185,13 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
   }
 
   private renderForm = (formikProps: FormikProps<FormValues>) => {
+    const onChangeCreateAnother = React.useCallback(
+      (e: React.ChangeEvent<{}>, checked: boolean) => {
+        formikProps.setFieldValue("createAnother", checked);
+      },
+      [formikProps]
+    );
+
     return (
       <Form>
         <Grid container spacing={3}>
@@ -167,29 +201,45 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
               name="rawJapaneseInput"
               label="Japanese"
               component={TextField}
+              multiline
+              rows={3}
+              fullWidth
             />
           </Grid>
-          <FormControl component="fieldset">
-            <FormLabel component="legend" required={true}>
-              Significance
-            </FormLabel>
-            <Field
-              name="significance"
-              label="Significance"
-              component={RadioGroup}
+
+          <Grid item sm={3}>
+            <FormControl fullWidth>
+              <InputLabel htmlFor="significance">Significance</InputLabel>
+              <Field
+                name="significance"
+                component={Select}
+                inputProps={{ id: "significance" }}
+              >
+                {objectValues(RecordSignificance).map(
+                  this.renderSignificanceChoice
+                )}
+              </Field>
+            </FormControl>
+          </Grid>
+          <Grid item sm={9} />
+
+          <Grid item sm={3}>
+            <Button
+              disabled={!formikProps.isValid}
+              color="primary"
+              onClick={formikProps.submitForm}
             >
-              {objectValues(RecordSignificance).map(
-                this.renderSignificanceChoice
-              )}
-            </Field>
-          </FormControl>
-          <Button
-            disabled={!formikProps.isValid}
-            color="primary"
-            onClick={formikProps.submitForm}
-          >
-            Submit
-          </Button>
+              Submit
+            </Button>
+          </Grid>
+          <Grid item sm={9}>
+            <FormControlLabel
+              control={<Field name="createAnother" component={Checkbox} />}
+              label="Create another record"
+              name="createAnother"
+              onChange={onChangeCreateAnother}
+            />
+          </Grid>
         </Grid>
       </Form>
     );
@@ -197,12 +247,9 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
 
   private renderSignificanceChoice = (significance: RecordSignificance) => {
     return (
-      <FormControlLabel
-        key={significance}
-        value={significance}
-        control={<Radio />}
-        label={RECORD_SIGNIFICANCE_DEFINITIONS[significance].displayName}
-      />
+      <MenuItem key={significance} value={significance}>
+        {RECORD_SIGNIFICANCE_DEFINITIONS[significance].displayName}
+      </MenuItem>
     );
   };
 
@@ -229,11 +276,19 @@ class RecordConfigureForm extends React.PureComponent<ComponentProps> {
         source
       };
 
-      await onSubmit(next);
+      const recordId = await onSubmit(next);
+
+      if (values.createAnother) {
+        actions.setFieldValue("rawJapaneseInput", "");
+      } else {
+        this.setState({ redirectRecordId: recordId });
+      }
     } catch (e) {
       actions.setStatus(e.message);
     } finally {
-      actions.setSubmitting(false);
+      if (!this.hasUnmounted) {
+        actions.setSubmitting(false);
+      }
     }
   };
 }

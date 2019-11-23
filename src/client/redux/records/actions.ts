@@ -21,19 +21,21 @@ export function createRecord(proto: ProtoRecord) {
       endpoint: "/record/create"
     });
 
+    const record: ServerRecord = {
+      id: recordId,
+      imageUrl: null,
+      timestampCreated,
+      ...proto,
+      officialTranslations: [],
+      userTranslations: []
+    };
     const action: ActionRecordCreated = {
-      type: "record-created",
-
-      record: {
-        id: recordId,
-        imageUrl: null,
-        timestampCreated,
-        ...proto,
-        officialTranslations: [],
-        userTranslations: []
-      }
+      record,
+      type: "record-created"
     };
 
     dispatch(action);
+
+    return record;
   };
 }
