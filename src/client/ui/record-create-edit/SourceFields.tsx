@@ -10,7 +10,7 @@ import { ArrowForwardIos as SubcategoryArrowIcon } from "@material-ui/icons";
 import classnames from "classnames";
 import { connect as connectFormik, Field, FormikContextType } from "formik";
 import { TextField } from "formik-material-ui";
-import { orderBy, values as objectValues } from "lodash";
+import { memoize, orderBy, values as objectValues } from "lodash";
 import * as React from "react";
 import { connect as connectReactRedux } from "react-redux";
 
@@ -77,6 +77,11 @@ function doesOriginTypeHaveCustomFields(type: OriginType): boolean {
 }
 
 class SourceFields extends React.PureComponent<ComponentProps> {
+  private readonly getOrderedOrigins = memoize(
+    (origins: ReadonlyArray<Origin>): ReadonlyArray<Origin> =>
+      orderBy(origins, origin => origin.title)
+  );
+
   public render() {
     const { classes, formik, originsLookup } = this.props;
 
@@ -116,7 +121,9 @@ class SourceFields extends React.PureComponent<ComponentProps> {
               onChange={this.onChangeOriginId}
             >
               {originType &&
-                originsLookup[originType].map(this.renderOriginChoice)}
+                this.getOrderedOrigins(originsLookup[originType]).map(
+                  this.renderOriginChoice
+                )}
             </Field>
           </FormControl>
         </Grid>
