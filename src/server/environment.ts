@@ -10,7 +10,10 @@ export interface ServerEnvironment {
   dbConnectionInfo: ConnectionInfo;
   yahooApiKey: string;
   corsHeaders: Readonly<{ [header: string]: string }>;
-  useHttps: boolean;
+  webserver: {
+    port: number;
+    useHttps: boolean;
+  };
 }
 
 /**
@@ -104,7 +107,10 @@ export function getServerEnvironment(args: CliArguments): ServerEnvironment {
       schema: dbSchema,
       user: dbUser
     },
-    useHttps: NODE_ENV !== "development",
+    webserver: {
+      port: args.port,
+      useHttps: NODE_ENV !== "development"
+    },
     yahooApiKey: envConfig[EnvKeys.YahooApiClientId]
   };
 }
