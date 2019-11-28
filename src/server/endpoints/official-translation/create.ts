@@ -12,7 +12,7 @@ export default async function createOfficialTranslationEndpoint(
   const { id } = await database.create(Schemas.OfficialTranslations, {
     comments: request.proto.comments,
     record_id: request.recordId,
-    translation: request.proto.translation
+    translation: request.proto.text
   });
 
   const response: CreateOfficialTranslationServerResponse = {

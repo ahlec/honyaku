@@ -16,7 +16,7 @@ export default async function createUserTranslationEndpoint(
     created: new Date(timestampCreated),
     modified: null,
     record_id: request.recordId,
-    translation: request.proto.translation
+    translation: request.proto.text
   });
 
   const response: CreateUserTranslationServerResponse = {

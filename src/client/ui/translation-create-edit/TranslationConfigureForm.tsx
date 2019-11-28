@@ -47,7 +47,7 @@ export default class TranslationConfigureForm extends React.PureComponent<
           comments: (current && current.comments) || "",
           confidence:
             (current && current.confidence) || TranslationConfidence.Confident,
-          translation: (current && current.translation) || ""
+          translation: (current && current.text) || ""
         };
       }
       case "official": {
@@ -55,7 +55,7 @@ export default class TranslationConfigureForm extends React.PureComponent<
         return {
           comments: (current && current.comments) || "",
           confidence: TranslationConfidence.Confident,
-          translation: (current && current.translation) || ""
+          translation: (current && current.text) || ""
         };
       }
     }
@@ -128,7 +128,7 @@ export default class TranslationConfigureForm extends React.PureComponent<
           await onSubmit({
             comments: values.comments,
             confidence: values.confidence,
-            translation: values.translation
+            text: values.translation
           });
           break;
         }
@@ -136,7 +136,7 @@ export default class TranslationConfigureForm extends React.PureComponent<
           const { onSubmit } = this.props;
           await onSubmit({
             comments: values.comments,
-            translation: values.translation
+            text: values.translation
           });
           break;
         }

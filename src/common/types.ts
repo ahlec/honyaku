@@ -69,12 +69,15 @@ export enum TranslationConfidence {
   Certain = "certain"
 }
 
-export interface UserTranslation {
+export interface TranslationBase {
   comments: string | null;
   id: number;
+  text: string;
+}
+
+export interface UserTranslation extends TranslationBase {
   timestampCreated: number;
   timestampModified: number | null;
-  translation: string;
   confidence: TranslationConfidence;
 }
 
@@ -83,11 +86,7 @@ export type ProtoUserTranslation = Omit<
   "id" | "timestampCreated" | "timestampModified"
 >;
 
-export interface OfficialTranslation {
-  comments: string | null;
-  id: number;
-  translation: string;
-}
+export type OfficialTranslation = TranslationBase;
 
 export type ProtoOfficialTranslation = Omit<OfficialTranslation, "id">;
 

@@ -178,11 +178,11 @@ export default async function initializeEndpoint(
       comments: dbRow.comments,
       confidence: getTranslationConfidence(dbRowCasted),
       id: dbRow.translation_id,
+      text: dbRow.translation,
       timestampCreated: dbRowCasted.created.valueOf(),
       timestampModified: dbRowCasted.modified
         ? dbRowCasted.modified.valueOf()
-        : null,
-      translation: dbRow.translation
+        : null
     });
   }
 
@@ -200,7 +200,7 @@ export default async function initializeEndpoint(
     arr.push({
       comments: dbRow.comments,
       id: dbRow.translation_id,
-      translation: dbRow.translation
+      text: dbRow.translation
     });
   }
 

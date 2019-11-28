@@ -55,7 +55,7 @@ export default function userTranslationsReducer(
       const { recordId, text, timestampModified, translationId } = action;
       return updateTranslation(state, recordId, translationId, {
         timestampModified,
-        translation: text
+        text
       });
     }
     default:

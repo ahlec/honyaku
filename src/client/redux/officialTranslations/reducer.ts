@@ -54,7 +54,7 @@ export default function officialTranslationsReducer(
     case "official-translation-text-changed": {
       const { recordId, text, translationId } = action;
       return updateTranslation(state, recordId, translationId, {
-        translation: text
+        text
       });
     }
     default:
