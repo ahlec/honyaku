@@ -1,12 +1,11 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import * as http from "http";
 import * as https from "https";
+import { toPairs } from "lodash";
 
+import { processCli } from "./cli";
 import Database from "./database/Database";
 import { ENDPOINTS } from "./endpointRegistry";
-import { CURRENT_ENVIRONMENT, Environment } from "./environment";
+import { getServerEnvironment } from "./environment";
 import Logger from "./Logger";
 import { FailureType } from "./types";
 import YahooAPI from "./YahooAPI";
@@ -33,36 +32,12 @@ async function readJsonBody(request: http.IncomingMessage): Promise<unknown> {
 }
 
 async function main() {
-  const {
-    DB_HOST,
-    DB_PORT,
-    DB_USER,
-    DB_PASSWORD,
-    DB_SCHEMA,
-    YAHOO_API_CLIENT_ID
-  } = process.env;
-  if (
-    !DB_HOST ||
-    !DB_PORT ||
-    !DB_USER ||
-    !DB_PASSWORD ||
-    !DB_SCHEMA ||
-    !YAHOO_API_CLIENT_ID
-  ) {
-    Logger.error("Missing one or more of the required .env fields");
-    process.exit(2);
-    return;
-  }
+  const args = processCli();
+  const serverEnvironment = getServerEnvironment(args);
+  const corsHeaders = toPairs(serverEnvironment.corsHeaders);
 
-  const database = Database.open({
-    host: DB_HOST,
-    password: DB_PASSWORD,
-    port: parseInt(DB_PORT, 10),
-    schema: DB_SCHEMA,
-    user: DB_USER
-  });
-
-  const yahooApi = new YahooAPI(YAHOO_API_CLIENT_ID);
+  const database = Database.open(serverEnvironment.dbConnectionInfo);
+  const yahooApi = new YahooAPI(serverEnvironment.yahooApiKey);
 
   async function handleRequest(
     request: http.IncomingMessage
@@ -132,13 +107,8 @@ async function main() {
     Logger.log("received...");
     const { body, statusCode } = await handleRequest(request);
 
-    if (CURRENT_ENVIRONMENT === Environment.Development) {
-      response.setHeader(
-        "Access-Control-Allow-Origin",
-        "http://localhost:7000"
-      );
-      response.setHeader("Access-Control-Allow-Credentials", "true");
-      response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    for (const [header, value] of corsHeaders) {
+      response.setHeader(header, value);
     }
 
     response.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -148,10 +118,9 @@ async function main() {
     response.end();
   }
 
-  const createServer =
-    CURRENT_ENVIRONMENT === Environment.Production
-      ? https.createServer
-      : http.createServer;
+  const createServer = serverEnvironment.useHttps
+    ? https.createServer
+    : http.createServer;
   createServer(serverDispatcher).listen(8081);
   Logger.log("listening...", process.env.NODE_ENV);
 }
