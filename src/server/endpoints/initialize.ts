@@ -169,12 +169,19 @@ export default async function initializeEndpoint(
       userTranslationsLookup[dbRow.record_id] = arr;
     }
 
+    // The current version of ts-node is outdated and doesn't seem to be
+    // able to infer that dbRow is `DBUserTranslation` and not `DBOfficialTranslation`.
+    // Help it out.
+    const dbRowCasted: DbUserTranslation = dbRow as DbUserTranslation;
+
     arr.push({
       comments: dbRow.comments,
-      confidence: getTranslationConfidence(dbRow as DbUserTranslation),
+      confidence: getTranslationConfidence(dbRowCasted),
       id: dbRow.translation_id,
-      timestampCreated: 0, // dbRow.created,
-      timestampModified: 0, // dbRow.modified,
+      timestampCreated: dbRowCasted.created.valueOf(),
+      timestampModified: dbRowCasted.modified
+        ? dbRowCasted.modified.valueOf()
+        : null,
       translation: dbRow.translation
     });
   }

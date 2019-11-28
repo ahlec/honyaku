@@ -52,6 +52,13 @@ export interface SchemaEntryTypes {
   [Schemas.UserTranslations]: DbUserTranslation;
 }
 
+export const SCHEMA_PRIMARY_KEY: { [schema in Schemas]: string } = {
+  [Schemas.OfficialTranslations]: "translation_id",
+  [Schemas.Origins]: "origin_id",
+  [Schemas.Records]: "record_id",
+  [Schemas.UserTranslations]: "translation_id"
+};
+
 export interface SchemaEntryProtoTypes {
   [Schemas.OfficialTranslations]: Omit<DbOfficialTranslation, "translation_id">;
   [Schemas.Origins]: Omit<DbOrigin, "origin_id">;

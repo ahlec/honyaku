@@ -1,5 +1,28 @@
+import { UserTranslation } from "@common/types";
+
 import { ReduxAction } from "@client/redux";
 import { UserTranslationsState } from "./index";
+
+function updateTranslation(
+  state: UserTranslationsState,
+  recordId: number,
+  translationId: number,
+  changes: Partial<UserTranslation>
+): UserTranslationsState {
+  const nextRecord = [...(state[recordId] || [])];
+  const index = nextRecord.findIndex(
+    translation => translation.id === translationId
+  );
+  if (index < 0) {
+    return state;
+  }
+
+  nextRecord[index] = { ...nextRecord[index], ...changes };
+  return {
+    ...state,
+    [recordId]: nextRecord
+  };
+}
 
 export default function userTranslationsReducer(
   state: UserTranslationsState | undefined = {},
@@ -27,6 +50,13 @@ export default function userTranslationsReducer(
         ...state,
         [recordId]: [...(state[recordId] || []), userTranslation]
       };
+    }
+    case "user-translation-text-changed": {
+      const { recordId, text, timestampModified, translationId } = action;
+      return updateTranslation(state, recordId, translationId, {
+        timestampModified,
+        translation: text
+      });
     }
     default:
       return state;

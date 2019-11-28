@@ -11,9 +11,19 @@ export interface CreateUserTranslationEndpoint {
   proto: ProtoUserTranslation;
 }
 
+export interface ChangeUserTranslationTextEndpoint {
+  translationId: number;
+  text: string;
+}
+
 export interface CreateOfficialTranslationEndpoint {
   recordId: number;
   proto: ProtoOfficialTranslation;
+}
+
+export interface ChangeOfficialTranslationTextEndpoint {
+  translationId: number;
+  text: string;
 }
 
 export interface KanjiMarkupEndpoint {

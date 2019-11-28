@@ -1,8 +1,14 @@
 import { fetchApi } from "@client/api";
 import { ReduxDispatch } from "@client/redux";
 
-import { CreateUserTranslationEndpoint } from "@common/endpoints";
-import { CreateUserTranslationServerResponse } from "@common/serverResponses";
+import {
+  ChangeUserTranslationTextEndpoint,
+  CreateUserTranslationEndpoint
+} from "@common/endpoints";
+import {
+  ChangeUserTranslationTextServerResponse,
+  CreateUserTranslationServerResponse
+} from "@common/serverResponses";
 import { ProtoUserTranslation, UserTranslation } from "@common/types";
 
 export interface ActionUserTranslationCreated {
@@ -12,7 +18,18 @@ export interface ActionUserTranslationCreated {
   userTranslation: UserTranslation;
 }
 
-export type UserTranslationActions = ActionUserTranslationCreated;
+export interface ActionUserTranslationTextChanged {
+  type: "user-translation-text-changed";
+
+  recordId: number;
+  timestampModified: number;
+  translationId: number;
+  text: string;
+}
+
+export type UserTranslationActions =
+  | ActionUserTranslationCreated
+  | ActionUserTranslationTextChanged;
 
 export function createUserTranslation(
   recordId: number,
@@ -39,6 +56,35 @@ export function createUserTranslation(
         timestampModified: null,
         ...proto
       }
+    };
+
+    dispatch(action);
+  };
+}
+
+export function changeUserTranslationText(
+  recordId: number,
+  translationId: number,
+  text: string
+) {
+  return async (dispatch: ReduxDispatch) => {
+    const payload: ChangeUserTranslationTextEndpoint = {
+      text,
+      translationId
+    };
+    const { timestampModified } = await fetchApi<
+      ChangeUserTranslationTextServerResponse
+    >({
+      body: payload,
+      endpoint: "/user-translation/change-text"
+    });
+
+    const action: ActionUserTranslationTextChanged = {
+      recordId,
+      text,
+      timestampModified,
+      translationId,
+      type: "user-translation-text-changed"
     };
 
     dispatch(action);

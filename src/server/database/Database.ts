@@ -1,7 +1,12 @@
 import { isArray } from "lodash";
 import { createPool, Pool } from "mysql2/promise";
 
-import { SchemaEntryProtoTypes, SchemaEntryTypes, Schemas } from "./schemas";
+import {
+  SCHEMA_PRIMARY_KEY,
+  SchemaEntryProtoTypes,
+  SchemaEntryTypes,
+  Schemas
+} from "./schemas";
 
 export interface ConnectionInfo {
   host: string;
@@ -53,6 +58,24 @@ export default class Database {
     }
 
     return { id: result.insertId };
+  }
+
+  public async update<TSchema extends Schemas>(
+    schema: TSchema,
+    id: number,
+    changes: Partial<SchemaEntryTypes[TSchema]>
+  ): Promise<boolean> {
+    const [
+      result
+    ] = await this.pool.query(
+      `UPDATE ${schema} SET ? WHERE ${SCHEMA_PRIMARY_KEY[schema]} = ?`,
+      [changes, id]
+    );
+    if (isArray(result)) {
+      throw new Error("Query SQL returned an array rather than an object.");
+    }
+
+    return result.changedRows === 1;
   }
 
   public async all<TSchema extends Schemas, TEntry = SchemaEntryTypes[TSchema]>(
