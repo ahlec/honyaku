@@ -4,7 +4,7 @@ interface FetchApiParameters {
 }
 
 const API_HOSTNAME =
-  process.env.NODE_ENV === "production" ? "" : `http://localhost:8081`;
+  process.env.NODE_ENV === "production" ? "" : `http://localhost:7001`;
 
 export async function fetchApi<TResponse>({
   endpoint,

@@ -13,7 +13,7 @@ export type CliArguments = {
 
 export function processCli(): CliArguments {
   return yargs.options({
-    port: { type: "number", default: 8081 },
+    port: { type: "number", default: 7001 },
     prod: { type: "boolean", default: false }
   }).argv;
 }
