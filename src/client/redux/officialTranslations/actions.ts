@@ -43,7 +43,8 @@ export function createOfficialTranslation(
       CreateOfficialTranslationServerResponse
     >({
       body: payload,
-      endpoint: "/official-translation/create"
+      endpoint: "/official-translation/create",
+      transferType: "json"
     });
 
     const action: ActionOfficialTranslationCreated = {
@@ -71,7 +72,8 @@ export function changeOfficialTranslationText(
     };
     await fetchApi<ChangeOfficialTranslationTextServerResponse>({
       body: payload,
-      endpoint: "/official-translation/change-text"
+      endpoint: "/official-translation/change-text",
+      transferType: "json"
     });
 
     const action: ActionOfficialTranslationTextChanged = {

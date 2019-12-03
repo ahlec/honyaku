@@ -44,7 +44,8 @@ export function createUserTranslation(
       CreateUserTranslationServerResponse
     >({
       body: payload,
-      endpoint: "/user-translation/create"
+      endpoint: "/user-translation/create",
+      transferType: "json"
     });
 
     const action: ActionUserTranslationCreated = {
@@ -76,7 +77,8 @@ export function changeUserTranslationText(
       ChangeUserTranslationTextServerResponse
     >({
       body: payload,
-      endpoint: "/user-translation/change-text"
+      endpoint: "/user-translation/change-text",
+      transferType: "json"
     });
 
     const action: ActionUserTranslationTextChanged = {

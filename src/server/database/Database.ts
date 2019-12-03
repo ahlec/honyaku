@@ -97,4 +97,30 @@ export default class Database {
 
     return results;
   }
+
+  public async single<
+    TSchema extends Schemas,
+    TEntry = SchemaEntryTypes[TSchema]
+  >(schema: TSchema, id: number): Promise<TEntry | null> {
+    const [
+      rows
+    ] = await this.pool.query(
+      `SELECT * FROM ${schema} WHERE ${SCHEMA_PRIMARY_KEY[schema]} = ?`,
+      [id]
+    );
+    if (!isArray(rows)) {
+      throw new Error("Query SQL did not return an array-type of results.");
+    }
+
+    if (!rows.length) {
+      return null;
+    }
+
+    const [row] = rows;
+    if (isArray(row)) {
+      throw new Error("Database does not support multi-queries yet.");
+    }
+
+    return row as any;
+  }
 }

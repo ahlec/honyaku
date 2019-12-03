@@ -266,7 +266,8 @@ class RecordConfigureForm extends React.PureComponent<
       };
       const { fragments } = await fetchApi<KanjiMarkupServerResponse>({
         body: kanjiMarkupBody,
-        endpoint: "/kanji/markup"
+        endpoint: "/kanji/markup",
+        transferType: "json"
       });
 
       const source = getSourceFromFormValues(values);

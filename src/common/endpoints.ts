@@ -6,6 +6,16 @@ import {
 
 export type CreateRecordEndpoint = ProtoRecord;
 
+export interface UploadRecordImageEndpointClientSide {
+  recordId: number;
+  image: Blob;
+}
+
+export interface UploadRecordImageEndpointServerSide {
+  recordId: number;
+  image: Buffer;
+}
+
 export interface CreateUserTranslationEndpoint {
   recordId: number;
   proto: ProtoUserTranslation;

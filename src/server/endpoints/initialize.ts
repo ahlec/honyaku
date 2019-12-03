@@ -217,7 +217,7 @@ export default async function initializeEndpoint(
 
     records.push({
       id: dbRow.record_id,
-      imageUrl: "", // TODO
+      imageUrl: dbRow.imgur_link,
       japaneseMarkup: dbRow.japanese_markup,
       officialTranslations: officialTranslationsLookup[dbRow.record_id] || [],
       significance: getSignificance(dbRow),

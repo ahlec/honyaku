@@ -36,7 +36,8 @@ export default async function createRecordEndpoint(
   const timestampCreated = Date.now();
   const { id } = await database.create(Schemas.Records, {
     created: new Date(timestampCreated),
-    has_image: 0,
+    imgur_id: null,
+    imgur_link: null,
     japanese_markup: request.japaneseMarkup,
     origin_chapter_no: chapterNo,
     origin_episode_no: episodeNo,

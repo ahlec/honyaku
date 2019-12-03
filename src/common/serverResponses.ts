@@ -13,6 +13,11 @@ export interface CreateRecordServerResponse {
   timestampCreated: number;
 }
 
+export interface UploadRecordImageServerResponse {
+  recordId: number;
+  imageLink: string;
+}
+
 export interface CreateUserTranslationServerResponse {
   userTranslationId: number;
   timestampCreated: number;

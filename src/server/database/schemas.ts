@@ -18,7 +18,8 @@ export interface DbRecord {
   record_id: number;
   created: DbTimestamp;
   significance: "difficult" | "good-example" | "interesting";
-  has_image: DbBoolean;
+  imgur_id: string | null;
+  imgur_link: string | null;
   origin_id: number;
   japanese_markup: string;
   origin_chapter_no: number | null;

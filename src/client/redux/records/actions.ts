@@ -18,7 +18,8 @@ export function createRecord(proto: ProtoRecord) {
       CreateRecordServerResponse
     >({
       body: proto,
-      endpoint: "/record/create"
+      endpoint: "/record/create",
+      transferType: "json"
     });
 
     const record: ServerRecord = {

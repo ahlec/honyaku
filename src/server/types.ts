@@ -1,6 +1,7 @@
 import { IncomingMessage } from "http";
 
 import Database from "./database/Database";
+import ImgurAPI from "./ImgurAPI";
 import YahooAPI from "./YahooAPI";
 
 export { IncomingMessage };
@@ -28,7 +29,8 @@ export interface Endpoint {
   processor: (
     body: unknown,
     database: Database,
-    yahooAPI: YahooAPI
+    yahooAPI: YahooAPI,
+    imgurApi: ImgurAPI
   ) => Promise<Response>;
   requiresAuthentication: boolean;
 }

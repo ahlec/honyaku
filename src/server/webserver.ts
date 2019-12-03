@@ -1,7 +1,9 @@
 import chalk from "chalk";
+import { readFileSync } from "fs";
 import * as http from "http";
 import * as https from "https";
 import { padStart, toPairs } from "lodash";
+import { File, Form } from "multiparty";
 
 import { ServerEnvironment } from "./environment";
 import Logger from "./Logger";
@@ -26,6 +28,75 @@ async function readJsonBody(request: http.IncomingMessage): Promise<unknown> {
       }
     });
   });
+}
+
+async function readMultiPartFormData(
+  request: http.IncomingMessage
+): Promise<unknown> {
+  const form = new Form();
+  return new Promise((resolve, reject) => {
+    form.parse(
+      request,
+      (
+        error,
+        fields: { [fieldName: string]: ReadonlyArray<string> },
+        files: { [fieldName: string]: ReadonlyArray<File> }
+      ) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        try {
+          const payload: any = {};
+          for (const field in fields) {
+            if (!fields.hasOwnProperty(field)) {
+              continue;
+            }
+
+            const values = fields[field];
+            if (values.length !== 1) {
+              throw new Error(
+                `Received ${fields.length} values for field '${field}.`
+              );
+            }
+
+            payload[field] = values[0];
+          }
+
+          for (const fieldName in files) {
+            if (!files.hasOwnProperty(fieldName)) {
+              continue;
+            }
+
+            const [file] = files[fieldName];
+            payload[fieldName] = readFileSync(file.path);
+          }
+
+          resolve(payload);
+        } catch (e) {
+          reject(e);
+        }
+      }
+    );
+  });
+}
+
+async function getRequestBody(request: http.IncomingMessage): Promise<unknown> {
+  const contentType = request.headers["content-type"];
+  if (!contentType) {
+    throw new Error("content-type header was not provided.");
+  }
+
+  if (contentType === "application/json") {
+    return readJsonBody(request);
+  }
+
+  if (contentType.startsWith("multipart/form-data;")) {
+    return readMultiPartFormData(request);
+  }
+
+  throw new Error("Unrecognized content-type header value.");
 }
 
 export default class Webserver {
@@ -101,7 +172,7 @@ export default class Webserver {
         };
       }
 
-      const body = await readJsonBody(request);
+      const body = await getRequestBody(request);
       const result = await this.endpointProcessor(endpoint, body);
       if (!result.success) {
         let statusCode: number;

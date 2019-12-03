@@ -1,0 +1,3 @@
+ALTER TABLE records DROP COLUMN has_image;
+ALTER TABLE records ADD COLUMN imgur_id VARCHAR(20);
+ALTER TABLE records ADD COLUMN imgur_link VARCHAR(100);
