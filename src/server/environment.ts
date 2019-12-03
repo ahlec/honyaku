@@ -5,9 +5,11 @@ import { resolve as resolvePath } from "path";
 
 import { CliArguments } from "./cli";
 import { ConnectionInfo } from "./database/Database";
+import { ImgurConfig } from "./ImgurAPI";
 
 export interface ServerEnvironment {
   dbConnectionInfo: ConnectionInfo;
+  imgur: ImgurConfig;
   yahooApiKey: string;
   corsHeaders: Readonly<{ [header: string]: string }>;
   webserver: {
@@ -32,7 +34,11 @@ enum EnvKeys {
   ProdDbSchema = "PROD_DB_SCHEMA",
   ProdDbPort = "PROD_DB_PORT",
 
-  YahooApiClientId = "YAHOO_API_CLIENT_ID"
+  YahooApiClientId = "YAHOO_API_CLIENT_ID",
+  ImgurClientId = "IMGUR_CLIENT_ID",
+  ImgurClientSecret = "IMGUR_CLIENT_SECRET",
+  ImgurAccessToken = "IMGUR_ACCESS_TOKEN",
+  ImgurRefreshToken = "IMGUR_REFRESH_TOKEN"
 }
 
 function getEnvConfig(): { [key in EnvKeys]: string } {
@@ -106,6 +112,12 @@ export function getServerEnvironment(args: CliArguments): ServerEnvironment {
       port: dbPort,
       schema: dbSchema,
       user: dbUser
+    },
+    imgur: {
+      accessToken: envConfig[EnvKeys.ImgurAccessToken],
+      clientId: envConfig[EnvKeys.ImgurClientId],
+      clientSecret: envConfig[EnvKeys.ImgurClientSecret],
+      refreshToken: envConfig[EnvKeys.ImgurRefreshToken]
     },
     webserver: {
       port: args.port,
