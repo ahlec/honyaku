@@ -18,6 +18,9 @@ import TranslationPanel from "./TranslationPanel";
 
 const styles = (theme: Theme) =>
   createStyles({
+    image: {
+      maxWidth: "100%"
+    },
     japaneseContainer: {
       marginBottom: theme.spacing(2),
       padding: theme.spacing(3),
@@ -67,6 +70,9 @@ class RecordView extends React.PureComponent<ComponentProps> {
     return (
       <Container maxWidth="md">
         <Paper className={classes.japaneseContainer} square>
+          {record.imageUrl && (
+            <img className={classes.image} src={record.imageUrl} />
+          )}
           <Typography variant="h3">
             <JapaneseMarkupDisplay japaneseMarkup={record.japaneseMarkup} />
           </Typography>

@@ -1,7 +1,11 @@
 import { fetchApi } from "@client/api";
 import { ReduxDispatch } from "@client/redux";
 
-import { CreateRecordServerResponse } from "@common/serverResponses";
+import { UploadRecordImageEndpointClientSide } from "@common/endpoints";
+import {
+  CreateRecordServerResponse,
+  UploadRecordImageServerResponse
+} from "@common/serverResponses";
 import { ProtoRecord, ServerRecord } from "@common/types";
 
 export interface ActionRecordCreated {
@@ -10,7 +14,14 @@ export interface ActionRecordCreated {
   record: ServerRecord;
 }
 
-export type RecordActions = ActionRecordCreated;
+export interface ActionRecordImageUploaded {
+  type: "record-image-uploaded";
+
+  imageLink: string;
+  recordId: number;
+}
+
+export type RecordActions = ActionRecordCreated | ActionRecordImageUploaded;
 
 export function createRecord(proto: ProtoRecord) {
   return async (dispatch: ReduxDispatch) => {
@@ -38,5 +49,28 @@ export function createRecord(proto: ProtoRecord) {
     dispatch(action);
 
     return record;
+  };
+}
+
+export function uploadRecordImage(recordId: number, image: Blob) {
+  return async (dispatch: ReduxDispatch) => {
+    const body: UploadRecordImageEndpointClientSide = {
+      recordId,
+      image
+    };
+
+    const { imageLink } = await fetchApi<UploadRecordImageServerResponse>({
+      body: body as any, // TODO
+      endpoint: "/record/upload-image",
+      transferType: "form-data"
+    });
+
+    const action: ActionRecordImageUploaded = {
+      imageLink,
+      recordId,
+      type: "record-image-uploaded"
+    };
+
+    dispatch(action);
   };
 }

@@ -30,6 +30,7 @@ import {
 
 import { fetchApi } from "@client/api";
 import { RECORD_SIGNIFICANCE_DEFINITIONS } from "@client/i18n/enums";
+import ImageEditor, { ImageData } from "@client/ui/components/ImageEditor";
 import { getLinkToRecordView } from "@client/ui/record-view/RecordRouteUnwrapper";
 
 import { FormValues } from "./shared";
@@ -50,7 +51,7 @@ type RecordId = number;
 interface ProvidedProps {
   current: ProtoRecord | null;
 
-  onSubmit: (record: ProtoRecord) => Promise<RecordId>;
+  onSubmit: (record: ProtoRecord, image: Blob | null) => Promise<RecordId>;
 }
 
 type ComponentProps = ProvidedProps & WithStyles<typeof styles>;
@@ -98,6 +99,7 @@ function getSourceFromFormValues(values: FormValues): Source {
 
 interface ComponentState {
   redirectRecordId: number | null;
+  currentImage: ImageData | null;
 }
 
 class RecordConfigureForm extends React.PureComponent<
@@ -105,8 +107,10 @@ class RecordConfigureForm extends React.PureComponent<
   ComponentState
 > {
   public state: ComponentState = {
-    redirectRecordId: null
+    redirectRecordId: null,
+    currentImage: null
   };
+  private readonly imageEditorRef = React.createRef<ImageEditor>();
   private hasUnmounted = false;
 
   private readonly getInitialValues = memoizeOne(
@@ -185,6 +189,8 @@ class RecordConfigureForm extends React.PureComponent<
   }
 
   private renderForm = (formikProps: FormikProps<FormValues>) => {
+    const { currentImage } = this.state;
+
     const onChangeCreateAnother = React.useCallback(
       (e: React.ChangeEvent<{}>, checked: boolean) => {
         formikProps.setFieldValue("createAnother", checked);
@@ -196,6 +202,7 @@ class RecordConfigureForm extends React.PureComponent<
       <Form>
         <Grid container spacing={3}>
           <SourceFields />
+
           <Grid item sm={12}>
             <Field
               name="rawJapaneseInput"
@@ -205,6 +212,17 @@ class RecordConfigureForm extends React.PureComponent<
               rows={3}
               fullWidth
             />
+          </Grid>
+
+          <Grid item sm={12}>
+            <FormControl fullWidth>
+              <InputLabel htmlFor="image">Image (optional)</InputLabel>
+              <ImageEditor
+                ref={this.imageEditorRef}
+                onChange={this.onImageChange}
+                value={currentImage}
+              />
+            </FormControl>
           </Grid>
 
           <Grid item sm={3}>
@@ -253,6 +271,9 @@ class RecordConfigureForm extends React.PureComponent<
     );
   };
 
+  private onImageChange = (image: ImageData) =>
+    this.setState({ currentImage: image });
+
   private onSubmit = async (
     values: FormValues,
     actions: FormikHelpers<FormValues>
@@ -277,12 +298,22 @@ class RecordConfigureForm extends React.PureComponent<
         source
       };
 
-      const recordId = await onSubmit(next);
+      const { current: imageEditor } = this.imageEditorRef;
+      let image: Blob | null = null;
+      if (imageEditor && this.state.currentImage) {
+        image = await imageEditor.getCurrentImage();
+      }
+
+      const recordId = await onSubmit(next, image);
 
       if (values.createAnother) {
         actions.setFieldValue("rawJapaneseInput", "");
+        this.setState({ currentImage: null });
       } else {
-        this.setState({ redirectRecordId: recordId });
+        this.setState({
+          currentImage: null,
+          redirectRecordId: recordId
+        });
       }
     } catch (e) {
       actions.setStatus(e.message);

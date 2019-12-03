@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { ProtoRecord } from "@common/types";
 
 import { ReduxDispatch } from "@client/redux";
-import { createRecord } from "@client/redux/records/actions";
+import { createRecord, uploadRecordImage } from "@client/redux/records/actions";
 
 import RecordConfigureForm from "./RecordConfigureForm";
 
@@ -19,9 +19,13 @@ class RecordCreateRouteUnwrapper extends React.PureComponent<ComponentProps> {
     return <RecordConfigureForm current={null} onSubmit={this.onSubmit} />;
   }
 
-  private onSubmit = async (proto: ProtoRecord) => {
+  private onSubmit = async (proto: ProtoRecord, image: Blob | null) => {
     const { dispatch } = this.props;
     const record = await dispatch(createRecord(proto));
+    if (image) {
+      await dispatch(uploadRecordImage(record.id, image));
+    }
+
     return record.id;
   };
 }

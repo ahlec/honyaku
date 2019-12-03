@@ -27,6 +27,21 @@ export default function recordsReducer(
         [record.id]: castToReduxRecord(record)
       };
     }
+    case "record-image-uploaded": {
+      const { imageLink, recordId } = action;
+      const existing = state[recordId];
+      if (!existing) {
+        return state;
+      }
+
+      return {
+        ...state,
+        [recordId]: {
+          ...existing,
+          imageUrl: imageLink
+        }
+      };
+    }
     default:
       return state;
   }
