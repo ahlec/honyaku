@@ -11,7 +11,7 @@ export default async function kanjiMarkupEndpoint(
   database: Database,
   yahooApi: YahooAPI
 ): Promise<Response> {
-  if (!request) {
+  if (!request.input) {
     return {
       message: "You must provide a non-empty string to this endpoint",
       success: false,
