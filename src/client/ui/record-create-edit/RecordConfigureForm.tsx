@@ -36,6 +36,9 @@ import { getLinkToRecordView } from "@client/ui/record-view/RecordRouteUnwrapper
 import { FormValues } from "./shared";
 import SourceFields from "./SourceFields";
 
+const IMAGE_MAX_WIDTH = 500;
+const IMAGE_MAX_HEIGHT = 500;
+
 const styles = (theme: Theme) =>
   createStyles({
     paper: {
@@ -301,7 +304,10 @@ class RecordConfigureForm extends React.PureComponent<
       const { current: imageEditor } = this.imageEditorRef;
       let image: Blob | null = null;
       if (imageEditor && this.state.currentImage) {
-        image = await imageEditor.getCurrentImage();
+        image = await imageEditor.getCurrentImage(
+          IMAGE_MAX_WIDTH,
+          IMAGE_MAX_HEIGHT
+        );
       }
 
       const recordId = await onSubmit(next, image);

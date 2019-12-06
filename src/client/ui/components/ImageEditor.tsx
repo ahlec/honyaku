@@ -27,7 +27,10 @@ function loadBlobAsImage(blob: Blob): Promise<HTMLImageElement> {
   });
 }
 
-function getCanvasAsBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+function getCanvasAsBlob(
+  canvas: HTMLCanvasElement,
+  type: "image/jpeg" | "image/png"
+): Promise<Blob> {
   return new Promise((resolve, reject) =>
     canvas.toBlob(
       blob => {
@@ -38,7 +41,7 @@ function getCanvasAsBlob(canvas: HTMLCanvasElement): Promise<Blob> {
 
         resolve(blob);
       },
-      "image/jpeg",
+      type,
       1
     )
   );
@@ -47,7 +50,9 @@ function getCanvasAsBlob(canvas: HTMLCanvasElement): Promise<Blob> {
 async function getCroppedImage(
   { crop, image }: ImageData,
   cropperWidth: number,
-  cropperHeight: number
+  cropperHeight: number,
+  maxWidth: number,
+  maxHeight: number
 ): Promise<Blob> {
   if (!crop) {
     return image;
@@ -73,8 +78,12 @@ async function getCroppedImage(
   const scaleX = img.naturalWidth / cropperWidth;
   const scaleY = img.naturalHeight / cropperHeight;
 
-  canvas.width = cropWidth;
-  canvas.height = cropHeight;
+  const ratio = Math.min(maxWidth / cropWidth, maxHeight / cropHeight);
+  const outputWidth = cropWidth * ratio;
+  const outputHeight = cropHeight * ratio;
+
+  canvas.width = outputWidth;
+  canvas.height = outputHeight;
 
   const ctx = canvas.getContext("2d")!;
   ctx.drawImage(
@@ -85,11 +94,11 @@ async function getCroppedImage(
     cropHeight * scaleY,
     0,
     0,
-    cropWidth,
-    cropHeight
+    outputWidth,
+    outputHeight
   );
 
-  return getCanvasAsBlob(canvas);
+  return getCanvasAsBlob(canvas, "image/jpeg");
 }
 
 async function rotateImage90deg(
@@ -115,7 +124,7 @@ async function rotateImage90deg(
   context.drawImage(image, 0, 0);
   context.restore();
 
-  return getCanvasAsBlob(canvas);
+  return getCanvasAsBlob(canvas, "image/png");
 }
 
 interface ComponentProps {
@@ -126,7 +135,7 @@ interface ComponentProps {
 export default class ImageEditor extends React.PureComponent<ComponentProps> {
   private readonly cropperRef = React.createRef<any>();
 
-  public getCurrentImage(): Promise<Blob> {
+  public getCurrentImage(maxWidth: number, maxHeight: number): Promise<Blob> {
     const { current: cropper } = this.cropperRef;
     if (!cropper) {
       throw new Error("No cropper");
@@ -138,7 +147,7 @@ export default class ImageEditor extends React.PureComponent<ComponentProps> {
     }
 
     const { height, width } = cropper.clientSize;
-    return getCroppedImage(value, width, height);
+    return getCroppedImage(value, width, height, maxWidth, maxHeight);
   }
 
   public render() {
@@ -158,7 +167,7 @@ export default class ImageEditor extends React.PureComponent<ComponentProps> {
           File:
           <input
             type="file"
-            accept="image/jpeg"
+            accept="image/jpeg,image/png"
             onChange={this.onFileUploaded}
           />
           {value && (
