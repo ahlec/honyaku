@@ -1,3 +1,8 @@
+import { IconButton } from "@material-ui/core";
+import {
+  RotateLeft as RotateLeftIcon,
+  RotateRight as RotateRightIcon
+} from "@material-ui/icons";
 import { isEqual } from "lodash";
 import * as React from "react";
 import { Crop } from "react-image-crop";
@@ -5,20 +10,47 @@ import { Crop } from "react-image-crop";
 import ImageCropper from "./ImageCropper";
 
 export interface ImageData {
-  image: File;
-
+  image: Blob;
   crop: Crop | undefined;
-
-  rotation: 0 | 90 | 180 | 270;
 }
 
-function getCroppedImage(
+function loadBlobAsImage(blob: Blob): Promise<HTMLImageElement> {
+  const img = new Image();
+  const objectUrl = window.URL.createObjectURL(blob);
+  return new Promise((resolve, reject) => {
+    img.src = objectUrl;
+    img.onload = () => resolve(img);
+    img.onerror = () => {
+      window.URL.revokeObjectURL(objectUrl);
+      reject(new Error("An error occurred loading the image."));
+    };
+  });
+}
+
+function getCanvasAsBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+  return new Promise((resolve, reject) =>
+    canvas.toBlob(
+      blob => {
+        if (!blob) {
+          reject(new Error("Could not convert canvas to blob."));
+          return;
+        }
+
+        resolve(blob);
+      },
+      "image/jpeg",
+      1
+    )
+  );
+}
+
+async function getCroppedImage(
   { crop, image }: ImageData,
   cropperWidth: number,
   cropperHeight: number
 ): Promise<Blob> {
   if (!crop) {
-    return Promise.resolve(image);
+    return image;
   }
 
   const { x: cropX, y: cropY, width: cropWidth, height: cropHeight } = crop;
@@ -32,53 +64,58 @@ function getCroppedImage(
     !isFinite(cropWidth) ||
     !isFinite(cropHeight)
   ) {
-    return Promise.resolve(image);
+    return image;
   }
 
   const canvas = document.createElement("canvas");
-  const img = new Image();
-  const objectUrl = window.URL.createObjectURL(image);
-  return new Promise((resolve, reject) => {
-    img.src = objectUrl;
-    img.onload = () => {
-      const scaleX = img.naturalWidth / cropperWidth;
-      const scaleY = img.naturalHeight / cropperHeight;
-      console.log(scaleX, scaleY);
+  const img = await loadBlobAsImage(image);
 
-      canvas.width = cropWidth;
-      canvas.height = cropHeight;
+  const scaleX = img.naturalWidth / cropperWidth;
+  const scaleY = img.naturalHeight / cropperHeight;
 
-      const ctx = canvas.getContext("2d")!;
-      ctx.drawImage(
-        img,
-        cropX * scaleX,
-        cropY * scaleY,
-        cropWidth * scaleX,
-        cropHeight * scaleY,
-        0,
-        0,
-        cropWidth,
-        cropHeight
-      );
+  canvas.width = cropWidth;
+  canvas.height = cropHeight;
 
-      canvas.toBlob(
-        blob => {
-          if (!blob) {
-            reject(new Error("Could not convert canvas to blob."));
-            return;
-          }
+  const ctx = canvas.getContext("2d")!;
+  ctx.drawImage(
+    img,
+    cropX * scaleX,
+    cropY * scaleY,
+    cropWidth * scaleX,
+    cropHeight * scaleY,
+    0,
+    0,
+    cropWidth,
+    cropHeight
+  );
 
-          resolve(blob);
-        },
-        "image/jpeg",
-        1
-      );
-    };
-    img.onerror = () => {
-      window.URL.revokeObjectURL(objectUrl);
-      reject(new Error("An error occurred loading the image."));
-    };
-  });
+  return getCanvasAsBlob(canvas);
+}
+
+async function rotateImage90deg(
+  blob: Blob,
+  direction: "left" | "right"
+): Promise<Blob> {
+  const image = await loadBlobAsImage(blob);
+  const { naturalWidth: width, naturalHeight: height } = image;
+  const canvas = document.createElement("canvas");
+  canvas.width = height;
+  canvas.height = width;
+
+  const theta = (Math.PI / 2) * (direction === "left" ? -1 : 1);
+
+  const context = canvas.getContext("2d")!;
+  context.save();
+  context.translate(
+    Math.abs((width / 2) * Math.cos(theta) + (height / 2) * Math.sin(theta)),
+    Math.abs((height / 2) * Math.cos(theta) + (width / 2) * Math.sin(theta))
+  );
+  context.rotate(theta);
+  context.translate(-width / 2, -height / 2);
+  context.drawImage(image, 0, 0);
+  context.restore();
+
+  return getCanvasAsBlob(canvas);
 }
 
 interface ComponentProps {
@@ -86,10 +123,8 @@ interface ComponentProps {
   value: ImageData | null;
 }
 
-const ROTATIONS: ReadonlyArray<ImageData["rotation"]> = [0, 90, 180, 270];
-
 export default class ImageEditor extends React.PureComponent<ComponentProps> {
-  private readonly cropperRef = React.createRef<ImageCropper>();
+  private readonly cropperRef = React.createRef<any>();
 
   public getCurrentImage(): Promise<Blob> {
     const { current: cropper } = this.cropperRef;
@@ -103,7 +138,6 @@ export default class ImageEditor extends React.PureComponent<ComponentProps> {
     }
 
     const { height, width } = cropper.clientSize;
-    console.log("h/w>", height, width);
     return getCroppedImage(value, width, height);
   }
 
@@ -118,7 +152,6 @@ export default class ImageEditor extends React.PureComponent<ComponentProps> {
             image={value.image}
             crop={value.crop}
             onCropChanged={this.onCropChanged}
-            rotation={value.rotation}
           />
         )}
         <div className="controls">
@@ -130,24 +163,18 @@ export default class ImageEditor extends React.PureComponent<ComponentProps> {
           />
           {value && (
             <React.Fragment>
-              Rotation:
-              <select onChange={this.onRotationChange} value={value.rotation}>
-                {ROTATIONS.map(this.renderRotationOption)}
-              </select>
+              <IconButton onClick={this.onRotateLeft}>
+                <RotateLeftIcon />
+              </IconButton>
+              <IconButton onClick={this.onRotateRight}>
+                <RotateRightIcon />
+              </IconButton>
             </React.Fragment>
           )}
         </div>
       </div>
     );
   }
-
-  private renderRotationOption = (rotation: number) => {
-    return (
-      <option key={rotation} value={rotation}>
-        {rotation}
-      </option>
-    );
-  };
 
   private onFileUploaded = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files || !event.target.files.length) {
@@ -157,8 +184,7 @@ export default class ImageEditor extends React.PureComponent<ComponentProps> {
     const newFile = event.target.files[0];
     this.emitChange({
       crop: undefined,
-      image: newFile,
-      rotation: 0
+      image: newFile
     });
   };
 
@@ -168,15 +194,29 @@ export default class ImageEditor extends React.PureComponent<ComponentProps> {
       crop
     });
 
-  private onRotationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  private onRotateLeft = async () => {
     const { value } = this.props;
     if (!value) {
       return;
     }
 
+    const image = await rotateImage90deg(value.image, "left");
     this.emitChange({
       ...value,
-      rotation: ROTATIONS[event.target.selectedIndex]
+      image
+    });
+  };
+
+  private onRotateRight = async () => {
+    const { value } = this.props;
+    if (!value) {
+      return;
+    }
+
+    const image = await rotateImage90deg(value.image, "right");
+    this.emitChange({
+      ...value,
+      image
     });
   };
 

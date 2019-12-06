@@ -1,34 +1,19 @@
-import { isEqual } from "lodash";
-import memoizeOne from "memoize-one";
 import React from "react";
 import ReactCrop, { Crop } from "react-image-crop";
 
 import "react-image-crop/dist/ReactCrop.css";
 
-interface ComponentProps {
+interface ProvidedProps {
   crop: Crop | undefined;
-  image: File;
+  image: Blob;
   onCropChanged: (crop: Crop) => void;
-  rotation: number;
 }
 
 interface ComponentState {
   objectUrl: string;
 }
 
-function shouldInvertCrop(rotation: number): boolean {
-  return !!(rotation % 180);
-}
-
-function invertCrop(crop: Crop): Crop {
-  return {
-    ...crop,
-    height: crop.width,
-    width: crop.height,
-    x: crop.y,
-    y: crop.x
-  };
-}
+type ComponentProps = ProvidedProps;
 
 export default class ImageCropper extends React.PureComponent<
   ComponentProps,
@@ -37,20 +22,6 @@ export default class ImageCropper extends React.PureComponent<
   private readonly cropperRef = React.createRef<{
     componentRef: HTMLDivElement | null;
   }>();
-
-  private readonly getRotatedCrop = memoizeOne(
-    (crop: Crop | undefined, rotation: number): Crop | undefined => {
-      if (!crop) {
-        return undefined;
-      }
-
-      if (!shouldInvertCrop(rotation)) {
-        return crop;
-      }
-
-      return invertCrop(crop);
-    }
-  );
 
   public constructor(props: ComponentProps) {
     super(props);
@@ -89,35 +60,18 @@ export default class ImageCropper extends React.PureComponent<
   }
 
   public render() {
-    const { crop, rotation } = this.props;
+    const { crop, onCropChanged } = this.props;
     const { objectUrl } = this.state;
 
     return (
       <ReactCrop
         ref={this.cropperRef as any}
         src={objectUrl}
-        crop={this.getRotatedCrop(crop, rotation)}
-        onChange={this.onCropChanged}
+        crop={crop}
+        onChange={onCropChanged}
         minWidth={100}
         minHeight={100}
       />
     );
   }
-
-  private onCropChanged = (rotatedCrop: Crop) => {
-    const { crop: currentCrop, onCropChanged, rotation } = this.props;
-
-    let normalizedCrop: Crop;
-    if (shouldInvertCrop(rotation)) {
-      normalizedCrop = invertCrop(rotatedCrop);
-    } else {
-      normalizedCrop = rotatedCrop;
-    }
-
-    if (isEqual(normalizedCrop, currentCrop)) {
-      return;
-    }
-
-    onCropChanged(normalizedCrop);
-  };
 }
