@@ -6,7 +6,7 @@ import { BrowserRouter } from "react-router-dom";
 import { createRedux } from "./redux/store";
 import Application from "./ui/Application";
 
-import "meyer-reset-scss/reset.scss";
+import "reset-css";
 
 const reduxStore = createRedux();
 

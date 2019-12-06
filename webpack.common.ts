@@ -18,20 +18,12 @@ const config: webpack.Configuration = {
         test: /\.(ts|tsx)$/
       },
       {
-        test: /\.scss$/,
-        use: ["style-loader", "css-loader", "postcss-loader", "sass-loader"]
-      },
-      {
         loader: "url-loader",
         test: /\.(png|jpg)$/
       },
       {
-        loader: "@svgr/webpack",
-        test: /\.svg$/
-      },
-      {
-        test: /\.md$/,
-        use: ["html-loader", "markdown-loader"]
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"]
       }
     ]
   },

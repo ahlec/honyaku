@@ -107,8 +107,8 @@ class RecordConfigureForm extends React.PureComponent<
   ComponentState
 > {
   public state: ComponentState = {
-    redirectRecordId: null,
-    currentImage: null
+    currentImage: null,
+    redirectRecordId: null
   };
   private readonly imageEditorRef = React.createRef<ImageEditor>();
   private hasUnmounted = false;
