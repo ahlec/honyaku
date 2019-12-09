@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "baseUrl": "./",
+    "baseUrl": "./src",
     "paths": {
-      "@client/*": ["src/client/*"],
-      "@server/*": ["src/server/*"],
-      "@common/*": ["src/common/*"]
+      "@client/*": ["client/*"],
+      "@server/*": ["server/*"],
+      "@common/*": ["common/*"]
     },
     "esModuleInterop": true,
     "jsx": "react",
@@ -17,6 +17,5 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "target": "ES2017"
-  },
-  "include": ["src/**/*"]
+  }
 }

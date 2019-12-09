@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./build/server/"
+  },
+  "extends": "./tsconfig.server.json",
+  "include": ["common/**/*", "server/**/*"]
+}

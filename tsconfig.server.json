@@ -1,4 +1,7 @@
 {
+  "compilerOptions": {
+    "outDir": "./build/server/"
+  },
   "extends": "./tsconfig.json",
   "include": ["src/common/**/*", "src/server/**/*"]
 }
