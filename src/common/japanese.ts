@@ -14,6 +14,31 @@ export function isCharKatakana(char: string): boolean {
   return char >= "\u30a0" && char <= "\u30ff";
 }
 
+const CHARCODE_ASCII_ZERO = 0x30;
+const CHARCODE_ASCII_NINE = 0x39;
+const CHARCODE_FULLWIDTH_ZERO = 0xff10;
+const CHARCODE_FULLWIDTH_NINE = 0xff19;
+
+export function getNumberFromChar(char: string): number {
+  const charCode = char.charCodeAt(0);
+  if (charCode >= CHARCODE_ASCII_ZERO && charCode <= CHARCODE_ASCII_NINE) {
+    return charCode - CHARCODE_ASCII_ZERO;
+  }
+
+  if (
+    charCode >= CHARCODE_FULLWIDTH_ZERO &&
+    charCode <= CHARCODE_FULLWIDTH_NINE
+  ) {
+    return charCode - CHARCODE_FULLWIDTH_ZERO;
+  }
+
+  return NaN;
+}
+
+export function isCharNumericDigit(char: string): boolean {
+  return !isNaN(getNumberFromChar(char));
+}
+
 const KATAKANA_TO_HIRAGANA_DELTA =
   "\u3041".charCodeAt(0) - "\u30a1".charCodeAt(0);
 

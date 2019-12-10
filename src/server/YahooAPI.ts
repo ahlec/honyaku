@@ -4,6 +4,7 @@ import queryString from "query-string";
 
 import {
   convertToHiragana,
+  getNumberFromChar,
   isCharHiragana,
   isCharKanji,
   isCharKatakana
@@ -12,7 +13,7 @@ import { JapaneseTextFragment } from "@common/japaneseMarkup";
 
 interface MAParseWord {
   surface: string;
-  reading: string;
+  reading: string | number;
   pos: string;
   baseform: string;
 }
@@ -108,7 +109,7 @@ function splitWordListOnReadings(
     const composition = getStringComposition(word.surface);
     if (composition !== StringComposition.BothKanjiAndKana) {
       chunks.push({
-        reading: word.reading,
+        reading: word.reading.toString(),
         surface: word.surface
       });
       continue;
@@ -144,11 +145,13 @@ function splitWordListOnReadings(
     }
 
     const regularExpression = new RegExp(`^${regexPatternChunks.join("")}$`);
-    const matches = convertToHiragana(word.reading).match(regularExpression);
+    const matches = convertToHiragana(word.reading.toString()).match(
+      regularExpression
+    );
 
     if (!matches) {
       chunks.push({
-        reading: word.reading,
+        reading: word.reading.toString(),
         surface: word.surface
       });
       continue;
@@ -182,6 +185,28 @@ function areSurfaceAndReadingEqual(surface: string, reading: string): boolean {
   // If both strings are the same length, check to see if they're
   // the same but in different syllabaries.
   if (surface.length === reading.length) {
+    // If both the surface and the reading are numbers, check to see if they're
+    // equal that way. This will account for full width/half width/ASCII digits.
+    let wereInputsNumeric = true;
+    for (let index = 0; index < surface.length; ++index) {
+      const surfaceDigit = getNumberFromChar(surface[index]);
+      const readingDigit = getNumberFromChar(reading[index]);
+      if (isNaN(surfaceDigit) || isNaN(readingDigit)) {
+        wereInputsNumeric = false;
+        break;
+      }
+
+      if (surfaceDigit !== readingDigit) {
+        return false;
+      }
+    }
+
+    if (wereInputsNumeric) {
+      return true;
+    }
+
+    // Convert between hiragana and katakana to prevent readings that are equal but in
+    // different syllabaries.
     for (let index = 0; index < surface.length; ++index) {
       const surfaceAsHiragana = convertToHiragana(surface[index]);
       const readingAsHiragana = convertToHiragana(reading[index]);
