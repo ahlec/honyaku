@@ -1,6 +1,7 @@
 import xmlParser from "fast-xml-parser";
-import { request, RequestOptions } from "https";
 import queryString from "query-string";
+
+import HttpsRequester from "./utils/HttpsRequester";
 
 import {
   convertToHiragana,
@@ -28,24 +29,6 @@ interface MAParseResult {
       };
     };
   };
-}
-
-async function makeHttpsRequest(options: RequestOptions): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const req = request(options, result => {
-      if (result.statusCode !== 200) {
-        reject(new Error(`Received status code of ${result.statusCode}.`));
-        return;
-      }
-
-      const chunks: string[] = [];
-      result.on("data", chunk => chunks.push(chunk));
-      result.on("end", () => resolve(chunks.join("")));
-    });
-
-    req.on("error", e => reject(e));
-    req.end();
-  });
 }
 
 interface ReadingChunk {
@@ -222,6 +205,8 @@ function areSurfaceAndReadingEqual(surface: string, reading: string): boolean {
 }
 
 export default class YahooAPI {
+  private readonly requester = new HttpsRequester("jlp.yahooapis.jp");
+
   public constructor(private readonly appId: string) {}
 
   public async convertSentenceToFragments(
@@ -270,8 +255,7 @@ export default class YahooAPI {
   private async performMorphologicalAnalysis(
     sentence: string
   ): Promise<MAParseResult> {
-    const rawXml = await makeHttpsRequest({
-      hostname: "jlp.yahooapis.jp",
+    const { body: rawXml } = await this.requester.request({
       method: "POST",
       path:
         "/MAService/V1/parse?" +

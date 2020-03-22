@@ -23,6 +23,8 @@ export default async function kanjiMarkupEndpoint(
   const fragments = await yahooApi.convertSentenceToFragments(request.input);
   Logger.log("fragments:", fragments);
 
+  throw new Error("stop here");
+
   const response: KanjiMarkupServerResponse = {
     fragments,
     input: request.input
